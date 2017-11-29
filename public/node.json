@@ -1,0 +1,37 @@
+{
+  "start": {
+    "instruction":"Reboot the device",
+    "responses":[
+      {
+        "answer":"It works",
+        "key":"works"
+      },
+      {
+        "answer":"green light turned on",
+        "key":"flip"
+      }]
+  },
+
+  "works": {
+    "instruction":"you're done. It works",
+    "responses":[]
+  },
+
+  "broken": {
+    "instruction":"contact an expert",
+    "responses":[]
+  },
+
+  "flip": {
+    "instruction": "flip the lever",
+    "responses": [
+      {
+        "answer":"It worked",
+        "key":"works"
+      },
+      {
+        "answer":""
+      }
+    ]
+  }
+}
