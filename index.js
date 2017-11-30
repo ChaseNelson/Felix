@@ -144,7 +144,6 @@ app.get('/fix-it', function(req, res) {
 });
 
 app.get('/fix-it/:key', function(req, res) {
-  console.log(req.params.key);
   res.render('fix-it', obj[req.params.key]);
 });
 
