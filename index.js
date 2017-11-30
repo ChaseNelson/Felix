@@ -118,7 +118,7 @@ app.get('/file-upload/:year/:month', function(req, res) {
 /* Below is about reading/writing to files */
 
 app.get('/readfile', function(req, res, next) {
-  fs.readFile('./public/node.json', function (err, data) {
+  fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
     if (err) return console.error(err);
     res.send("the File : " + data.toString());
   });
