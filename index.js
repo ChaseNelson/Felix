@@ -98,22 +98,22 @@ app.get('/file-upload/:year/:month', function(req, res) {
 //   secret: credentials.cookieSecret,
 // }));
 
-app.use(function(req, res, next) {
-  var views = req.session.views;
-
-  if (!views) {
-    views = req.session.views = {};
-  }
-
-  var pathname = parseurl(req).pathname;
-
-  views[pathname] = (views[pathname] || 0) + 1;
-  next();
-});
-
-app.get('/viewcount', function(req, res, next) {
-  res.send('You viewed this page ' + req.session.views['/viewcount'] + ' times');
-});
+// app.use(function(req, res, next) {
+//   var views = req.session.views;
+//
+//   if (!views) {
+//     views = req.session.views = {};
+//   }
+//
+//   var pathname = parseurl(req).pathname;
+//
+//   views[pathname] = (views[pathname] || 0) + 1;
+//   next();
+// });
+//
+// app.get('/viewcount', function(req, res, next) {
+//   res.send('You viewed this page ' + req.session.views['/viewcount'] + ' times');
+// });
 
 /* Below is about reading/writing to files */
 
