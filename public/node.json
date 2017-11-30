@@ -7,7 +7,7 @@
         "key":"/fix-it/works"
       },
       {
-        "answer":"green light turned on",
+        "answer":"Green light turned on",
         "key":"/fix-it/flip"
       }]
   },
@@ -18,7 +18,7 @@
   },
 
   "broken": {
-    "instruction":"contact an expert",
+    "instruction":"Contact an expert. Then send us what the expert did so we can imporove this site.",
     "responses":[]
   },
 
