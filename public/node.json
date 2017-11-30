@@ -4,33 +4,34 @@
     "responses":[
       {
         "answer":"It works",
-        "key":"works"
+        "key":"/fix-it/works"
       },
       {
-        "answer":"green light turned on",
-        "key":"flip"
+        "answer":"Green light turned on",
+        "key":"/fix-it/flip"
       }]
   },
 
   "works": {
-    "instruction":"you're done. It works",
+    "instruction":"It works! You're done. Have a great day.",
     "responses":[]
   },
 
   "broken": {
-    "instruction":"contact an expert",
+    "instruction":"Contact an expert. Then send us what the expert did so we can imporove this site.",
     "responses":[]
   },
 
   "flip": {
-    "instruction": "flip the lever",
+    "instruction": "Flip the lever",
     "responses": [
       {
         "answer":"It worked",
-        "key":"works"
+        "key":"/fix-it/works"
       },
       {
-        "answer":""
+        "answer":"It's not working",
+        "key":"/fix-it/broken"
       }
     ]
   }

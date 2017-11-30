@@ -2,14 +2,25 @@
   <h3>Fix-It</h3>
 </div>
 <div>
-  <div>
-    <h3>Try the following instruction</h3>
-    <h4>{{instruction}}</h4>
-  </div>
-  <div>
-    <h3>What happened</h3>
+  {{#if responses}}
     <div>
-      
+      <h3>Try the following instruction</h3>
+      <br>
+      <h4>{{instruction}}</h4>
     </div>
+  {{else}}
+    <div>
+      <h3>{{instruction}}</h3>
+    </div>
+  {{/if}}
+  {{#if responses}}
+  <div id="responses">
+    <h3>What happened</h3>
+    <ul>
+      {{#each responses}}
+      <li><a href={{key}}>{{answer}}</a></li>
+      {{/each}}
+    </ul>
   </div>
+  {{/if}}
 </div>
