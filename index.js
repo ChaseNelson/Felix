@@ -22,7 +22,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res) {
-  res.render('home', {user: {id:12, name:"chase"}});
+  res.render('home'/*, {user: {id:12, name:"chase"}}*/);
 });
 
 app.use(function(req, res, next) {
