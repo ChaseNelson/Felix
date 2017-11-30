@@ -141,7 +141,12 @@ fs.readFile('./public/node.json', function (err, data) {
 })
 app.get('/fix-it', function(req, res) {
   res.render('fix-it', obj['start']);
-})
+});
+
+app.get('/fix-it/:key', function(req, res) {
+  console.log(req.params.key);
+  res.render('fix-it', obj[req.params.key]);
+});
 
 
 app.use(function(req, res) {
