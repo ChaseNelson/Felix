@@ -1,6 +1,6 @@
 const express     = require('express');
 const formidable  = require('formidable');
-const credentials = require('./credentials.js');
+// const credentials = require('./credentials.js');
 const session     = require('express-session');
 const parseurl    = require('parseurl');
 const fs          = require('fs');
@@ -15,7 +15,7 @@ app.set('view engine', 'handlebars');
 
 app.use(require('body-parser').urlencoded({extended:true}));
 
-app.use(require('cookie-parser')(credentials.cookieSecret));
+// app.use(require('cookie-parser')(credentials.cookieSecret));
 
 
 app.set('port', process.env.PORT || 3000);
@@ -78,47 +78,47 @@ app.get('/file-upload/:year/:month', function(req, res) {
   });
 });
 
-app.get('/cookie', function(req, res) {
-  res.cookie('username', 'Chase Nelson', {expire: new Date() + 9999}).send('username has the value of Chase Nelson');
-});
+// app.get('/cookie', function(req, res) {
+//   res.cookie('username', 'Chase Nelson', {expire: new Date() + 9999}).send('username has the value of Chase Nelson');
+// });
+//
+// app.get('/listcookies', function(req, res) {
+//   console.log('Cookies : ' + req.cookies);
+//   res.send('Look in the console for cookies');
+// });
+//
+// app.get('/deletecookie', function(req, res) {
+//   res.clearCookie('username');
+//   res.send('username Cookie Deleted');
+// });
+//
+// app.use(session({
+//   resave: false,
+//   saveUninitialized: true,
+//   secret: credentials.cookieSecret,
+// }));
 
-app.get('/listcookies', function(req, res) {
-  console.log('Cookies : ' + req.cookies);
-  res.send('Look in the console for cookies');
-});
-
-app.get('/deletecookie', function(req, res) {
-  res.clearCookie('username');
-  res.send('username Cookie Deleted');
-});
-
-app.use(session({
-  resave: false,
-  saveUninitialized: true,
-  secret: credentials.cookieSecret,
-}));
-
-app.use(function(req, res, next) {
-  var views = req.session.views;
-
-  if (!views) {
-    views = req.session.views = {};
-  }
-
-  var pathname = parseurl(req).pathname;
-
-  views[pathname] = (views[pathname] || 0) + 1;
-  next();
-});
-
-app.get('/viewcount', function(req, res, next) {
-  res.send('You viewed this page ' + req.session.views['/viewcount'] + ' times');
-});
+// app.use(function(req, res, next) {
+//   var views = req.session.views;
+//
+//   if (!views) {
+//     views = req.session.views = {};
+//   }
+//
+//   var pathname = parseurl(req).pathname;
+//
+//   views[pathname] = (views[pathname] || 0) + 1;
+//   next();
+// });
+//
+// app.get('/viewcount', function(req, res, next) {
+//   res.send('You viewed this page ' + req.session.views['/viewcount'] + ' times');
+// });
 
 /* Below is about reading/writing to files */
 
 app.get('/readfile', function(req, res, next) {
-  fs.readFile('./public/node.json', function (err, data) {
+  fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
     if (err) return console.error(err);
     res.send("the File : " + data.toString());
   });
@@ -135,7 +135,7 @@ app.get('/writefile', function(req, res, next) {
 });
 
 /* End of file I/O */
-fs.readFile('./public/node.json', function (err, data) {
+fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
   if (err) return console.error(err);
   obj = JSON.parse(data);
 })
