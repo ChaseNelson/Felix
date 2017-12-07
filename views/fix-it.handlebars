@@ -14,13 +14,19 @@
     </div>
   {{/if}}
   {{#if responses}}
-  <div id="responses">
-    <h3>What happened</h3>
-    <ul>
-      {{#each responses}}
-      <li><a href={{key}}>{{answer}}</a></li>
-      {{/each}}
-    </ul>
-  </div>
+    <div id="responses">
+      <h3>What happened</h3>
+      <ul>
+        {{#each responses}}
+        <li><a href={{key}}>{{answer}}</a></li>
+        {{/each}}
+      </ul>
+    </div>
+    <div>
+      <button type="button" name="backButton" onclick="goBack()">Go back</button>
+    </div>
+    <script type="text/javascript">
+      function goBack() { window.history.back(); }
+    </script>
   {{/if}}
 </div>
