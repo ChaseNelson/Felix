@@ -21,8 +21,14 @@ app.use(require('body-parser').urlencoded({extended:true}));
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public'));
 
+
+fs.readFile('./public/machineList.json', function (err, data) {
+  if (err) return console.error(err);
+  list = JSON.parse(data);
+});
+
 app.get('/', function(req, res) {
-  res.render('home'/*, {user: {id:12, name:"chase"}}*/);
+  res.render('home', list);
 });
 
 app.use(function(req, res, next) {
@@ -137,14 +143,13 @@ app.get('/writefile', function(req, res, next) {
 /* End of file I/O */
 fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
   if (err) return console.error(err);
-  obj = JSON.parse(data);
+  wireBonder = JSON.parse(data);
 })
-app.get('/fix-it', function(req, res) {
-  res.render('fix-it', obj['start']);
+app.get('/wireBonder', function(req, res) {
+  res.render('fix-it', wireBonder['start']);
 });
-
-app.get('/fix-it/:key', function(req, res) {
-  res.render('fix-it', obj[req.params.key]);
+app.get('/wireBonder/:key', function(req, res) {
+  res.render('fix-it', wireBonder[req.params.key]);
 });
 
 

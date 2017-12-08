@@ -4,19 +4,19 @@
     "responses":[
       {
         "answer":"It works!",
-        "key":"/fix-it/works"
+        "key":"/wireBonder/works"
       },
       {
         "answer":"Green light turned on",
-        "key":"/fix-it/lever"
+        "key":"/wireBonder/lever"
       },
       {
         "answer":"Red light turned on",
-        "key":"/fix-it/broken"
+        "key":"/wireBonder/broken"
       },
       {
         "answer":"No lights turned on",
-        "key":"/fix-it/fuse"
+        "key":"/wireBonder/fuse"
       }
     ]
   },
@@ -36,11 +36,11 @@
     "responses": [
       {
         "answer":"It works!",
-        "key":"/fix-it/works"
+        "key":"/wireBonder/works"
       },
       {
         "answer":"Still not working",
-        "key":"/fix-it/lever"
+        "key":"/wireBonder/lever"
       }
     ]
   },
@@ -50,15 +50,15 @@
     "responses": [
       {
         "answer":"It works!",
-        "key":"/fix-it/works"
+        "key":"/wireBonder/works"
       },
       {
         "answer":"Green light is now blinking",
-        "key":"/fix-it/display"
+        "key":"/wireBonder/display"
       },
       {
         "answer":"Green light still solid",
-        "key":"/fix-it/yellow-button"
+        "key":"/wireBonder/yellow-button"
       }
     ]
   },
@@ -68,11 +68,11 @@
     "responses": [
       {
         "answer":"Green light is now blinking",
-        "key":"/fix-it/display"
+        "key":"/wireBonder/display"
       },
       {
         "answer":"Nothing happend",
-        "key":"/fix-it/broken"
+        "key":"/wireBonder/broken"
       }
     ]
   },
@@ -82,15 +82,15 @@
     "responses": [
       {
         "answer":"It works!",
-        "key":"/fix-it/works"
+        "key":"/wireBonder/works"
       },
       {
         "answer":"White screen",
-        "key":"/fix-it/white-screen"
+        "key":"/wireBonder/white-screen"
       },
       {
         "answer":"Verticle bars on screen",
-        "key":"/fix-it/verticle-bars"
+        "key":"/wireBonder/verticle-bars"
       }
     ]
   },
@@ -100,11 +100,11 @@
     "responses": [
       {
         "answer":"It works!",
-        "key":"/fix-it/works"
+        "key":"/wireBonder/works"
       },
       {
         "answer":"It does not work",
-        "key":"/fix-it/broken"
+        "key":"/wireBonder/broken"
       }
     ]
   },
@@ -114,11 +114,11 @@
     "responses": [
       {
         "answer":"It works!",
-        "key":"/fix-it/works"
+        "key":"/wireBonder/works"
       },
       {
         "answer":"It does not work",
-        "key":"/fix-it/broken"
+        "key":"/wireBonder/broken"
       }
     ]
   }
