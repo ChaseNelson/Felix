@@ -139,12 +139,12 @@ fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
   if (err) return console.error(err);
   obj = JSON.parse(data);
 })
-app.get('/fix-it', function(req, res) {
-  res.render('fix-it', obj['start']);
+app.get('/felix', function(req, res) {
+  res.render('felix', obj['start']);
 });
 
-app.get('/fix-it/:key', function(req, res) {
-  res.render('fix-it', obj[req.params.key]);
+app.get('/felix/:key', function(req, res) {
+  res.render('felix', obj[req.params.key]);
 });
 
 
