@@ -3,9 +3,11 @@
 </div>
 <div>
   <h3>What machine needs fixing?</h3>
-  <ul>
-    {{#each machineList}}
-      <li><a href="{{link}}"><h4>{{name}}</h4></a></li>
-    {{/each}}
-  </ul>
+  <div class="machineList">
+    <ul>
+      {{#each ids}}
+        <li><a href='/fix-it/{{this}}'>{{this}}</a></li>
+      {{/each}}
+    </ul>
+  </div>
 </div>
