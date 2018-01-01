@@ -7,8 +7,10 @@ change -->
 <div>
   <h3>What machine do you want to edit?</h3>
   <div class="machineList">
-    {{#each ids}}
-      <p>{{this}}</p><br>
-    {{/each}}
+    <ul>
+      {{#each ids}}
+        <li><a href='/edit/{{this}}'>{{this}}</a></li>
+      {{/each}}
+    </ul>
   </div>
 </div>
