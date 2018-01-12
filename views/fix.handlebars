@@ -1,0 +1,20 @@
+<!-- view page for a specific machine
+should let the user travers through the tree -->
+<!-- new link should be based on the previous links
+find a way to keep appending the new link to the end -->
+<div class="page-header">
+  <h3>{{name}} Fix-It</h3>
+</div>
+<div>
+  <h3>Try the following instruction</h3>
+  <br>
+  <h4>{{node.instruction}}</h4>
+  <div class="options">
+    <h3>What happened</h3>
+    <ul>
+      {{#each node.children}}
+        <li><a href='/fix-it/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
+      {{/each}}
+    </ul>
+  </div>
+</div>
