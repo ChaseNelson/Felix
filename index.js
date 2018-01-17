@@ -140,8 +140,6 @@ let ids = [];
 trees['wireBonder'] = new Tree('Reboot the machine');
 trees['wireBonder'].put('flip the lever', 'the green light turned on', 'ROOT');
 trees['wireBonder'].put('check the fuse', 'the red light turned on', 'ROOT');
-trees['wireBonder'].put('Congrats it works', 'it works', '0');
-trees['wireBonder'].put('contact an expret', 'something else happend', '0');
 trees['wireBonder'].put('press the button', 'the green light turned off', '0');
 ids.push('wireBonder');
 trees['gantree'] = new Tree('Plug the device in');
@@ -242,7 +240,15 @@ app.get('/wireBonder/:key', function(req, res) {
 
 app.get('/fix-it/:machine/', function(req, res) {
   res.render('fix', {name:req.params.machine, node:trees[req.params.machine].root});
-})
+});
+
+app.get('/fix-it/:machine/works', function(req, res) {
+  res.render('itWorks', {name:req.params.machine});
+});
+
+app.get('/fix-it/:machine/expert', function(req, res) {
+  res.render('expert', {name:req.params.machine});
+});
 
 app.get('/fix-it/:machine/:node', function(req, res) {
   let str = req.params.node.split('.');
@@ -252,15 +258,15 @@ app.get('/fix-it/:machine/:node', function(req, res) {
     currNode = currNode.children[index];
   }
   res.render('fix', {name:req.params.machine, node:currNode, trace:req.params.node})
-})
+});
 
 app.get('/edit', function(req, res) {
   res.render('editChooseMachine', {ids});
-})
+});
 
 app.get('/edit/:machine', function(req, res) {
   res.render('editMachine', trees[req.params.machine]);
-})
+});
 
 app.use(function(req, res) {
   res.type('text/html');
