@@ -1,9 +1,124 @@
-const express     = require('express');
-const formidable  = require('formidable');
-// const credentials = require('./credentials.js');
-const session     = require('express-session');
-const parseurl    = require('parseurl');
-const fs          = require('fs');
+const express    = require('express');
+const formidable = require('formidable');
+const session    = require('express-session');
+const parseurl   = require('parseurl');
+const fs         = require('fs');
+
+// @TODO:: find a way to import the tree struct
+//         rather then having the following lines
+/* Tree data structure */
+class Node {
+  constructor(instruction, key) {
+    this.instruction = instruction;
+    this.key = key;
+    this.children = [];
+  }
+}
+
+class Tree {
+  constructor(instruction) {
+    if (typeof instruction == 'undefined') {
+      this.root = null;
+    } else {
+      this.root = new Node(instruction, 'ROOT');
+    }
+  }
+
+  search(instruction, key, currentNode) {
+    if (currentNode.instruction === instruction && currentNode.key === key) {
+      return currentNode;
+    }
+    let children = currentNode.children;
+    for (let i = 0; i < children.length; i++) {
+      if (this.search(instruction, key, children[i]) !== false) return currentNode;
+    }
+    return false;
+  }
+
+  addRoot(instruction) {
+    if (this.root == null) {
+      this.root = new Node(instruction, 'ROOT');
+      return this.root;
+    }
+  }
+
+  put(instruction, key, nodeStr) {
+    if (nodeStr === '' || nodeStr === 'ROOT') {
+      this.root.children.push(new Node(instruction, key));
+      return;
+    }
+    let str = nodeStr.split('.')
+    let currNode = this.root;
+    for (let i = 0; i < str.length; i++) {
+      let temp = parseInt(str[i]);
+      currNode = currNode.children[temp];
+    }
+    let newNode = new Node(instruction, key);
+    try {
+      currNode.children.push(newNode);
+    } catch(e) {
+      console.error('Something went wrong!');
+      console.error(e);
+    }
+  }
+
+  editNode(nodePath, newName, mode) {
+    if (nodePath === 'ROOT' || nodePath === '') {
+      if (mode === 'I') this.root.instruction = newName;
+      return;
+    }
+    let str      = nodePath.split('.');
+    let currNode = this.root;
+    for (let i = 0; i < str.length; i++) {
+      let index = parseInt(str[i]);
+      currNode = currNode.children[index];
+    }
+    try {
+      if (mode === 'K') {
+        currNode.key = newName;
+      } else if (mode === 'I') {
+        currNode.instruction = newName;
+      }
+    } catch(e) {
+      console.error('Something went wrong');
+      console.error(e);
+    }
+  }
+
+  deleteNode(nodePath) {
+    if (nodePath === 'ROOT' || nodePath === '') {
+      console.log('tried to delete root\nnot allowed');
+      alert('You cannot remove the ROOT node');
+      return;
+    }
+    let str      = nodePath.split('.');
+    let currNode = this.root;
+    let parentNode;
+    let ele;
+    if (str.length - 1 <= 0) {
+      parentNode = this.root;
+    }
+    for (let i = 0; i < str.length; i++) {
+      let index = parseInt(str[i]);
+      currNode = currNode.children[index];
+      if (i === str.length - 2) {
+        parentNode = currNode;
+      } else if (i === str.length - 1) {
+        ele = i;
+      }
+    }
+
+    for (let i = 0; i < currNode.children.length; i++) {
+      this.deleteNode(nodePath + '.' + i);
+    }
+
+    currNode.instruction = null;
+    currNode.key = null;
+    currNode = null;
+    // remove currNode from parent children array
+    parentNode.children.splice(ele, 1);
+  }
+} /* End of Tree data structure */
 
 var app = express();
 
@@ -15,12 +130,23 @@ app.set('view engine', 'handlebars');
 
 app.use(require('body-parser').urlencoded({extended:true}));
 
-// app.use(require('cookie-parser')(credentials.cookieSecret));
-
-
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public'));
 
+// @TODO:: remove the following lines once done with testing
+// The line below init two empty trees for a wirebonder and a gantree
+let trees = {};
+let ids = [];
+trees['wireBonder'] = new Tree('Reboot the machine');
+trees['wireBonder'].put('flip the lever', 'the green light turned on', 'ROOT');
+trees['wireBonder'].put('check the fuse', 'the red light turned on', 'ROOT');
+trees['wireBonder'].put('Congrats it works', 'it works', '0');
+trees['wireBonder'].put('contact an expret', 'something else happend', '0');
+trees['wireBonder'].put('press the button', 'the green light turned off', '0');
+ids.push('wireBonder');
+trees['gantree'] = new Tree('Plug the device in');
+ids.push('gantree');
+// End of test lines
 
 fs.readFile('./public/machineList.json', function (err, data) {
   if (err) return console.error(err);
@@ -28,7 +154,7 @@ fs.readFile('./public/machineList.json', function (err, data) {
 });
 
 app.get('/', function(req, res) {
-  res.render('home', list);
+  res.render('home', {ids});
 });
 
 app.use(function(req, res, next) {
@@ -58,12 +184,31 @@ app.get('/thankyou', function(req, res) {
   res.render('thankyou');
 });
 
+app.get('/new-machine', function(req, res) {
+  res.render('new-machine');
+});
+
 app.post('/process', function(req, res) {
   console.log("Form : " + req.query.form);
-  console.log("CSRF token : " + req.body._csrf);
-  console.log("Email : " + req.body.email);
-  console.log("Question : " + req.body.ques);
+  console.log("Machine Name : " + req.body.name);
+  console.log("Root Node : " + req.body.rootNode);
+  if (req.query.form === 'formNewMachine') {
+    if (typeof trees[req.body.name] === "undefined") {
+      ids.push(req.body.name);
+      trees[req.body.name] = new Tree();
+      trees[req.body.name].addRoot(req.body.rootNode);
+      console.log(trees);
+    } else {
+      // machine already exsits
+      console.error(req.body.name + 'is already a machine in the database');
+    }
+  }
   res.redirect(303, '/thankyou');
+  // var fn = "/public/repairDB_" + req.body.name + ".json";
+  // fs.writeFile(fn, function(err) {
+  //   if (err) return console.log(err);
+  //   console.log();
+  // })
 });
 
 app.get('/file-upload', function(req, res) {
@@ -84,63 +229,6 @@ app.get('/file-upload/:year/:month', function(req, res) {
   });
 });
 
-// app.get('/cookie', function(req, res) {
-//   res.cookie('username', 'Chase Nelson', {expire: new Date() + 9999}).send('username has the value of Chase Nelson');
-// });
-//
-// app.get('/listcookies', function(req, res) {
-//   console.log('Cookies : ' + req.cookies);
-//   res.send('Look in the console for cookies');
-// });
-//
-// app.get('/deletecookie', function(req, res) {
-//   res.clearCookie('username');
-//   res.send('username Cookie Deleted');
-// });
-//
-// app.use(session({
-//   resave: false,
-//   saveUninitialized: true,
-//   secret: credentials.cookieSecret,
-// }));
-
-// app.use(function(req, res, next) {
-//   var views = req.session.views;
-//
-//   if (!views) {
-//     views = req.session.views = {};
-//   }
-//
-//   var pathname = parseurl(req).pathname;
-//
-//   views[pathname] = (views[pathname] || 0) + 1;
-//   next();
-// });
-//
-// app.get('/viewcount', function(req, res, next) {
-//   res.send('You viewed this page ' + req.session.views['/viewcount'] + ' times');
-// });
-
-/* Below is about reading/writing to files */
-
-app.get('/readfile', function(req, res, next) {
-  fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
-    if (err) return console.error(err);
-    res.send("the File : " + data.toString());
-  });
-});
-
-app.get('/writefile', function(req, res, next) {
-  fs.writeFile('./public/randomfile.txt','More text', function (err) {
-    if (err) return console.error(err);
-  });
-  fs.readFile('./public/randomfile.txt', function (err, data) {
-    if (err) return console.error(err);
-    res.send("The File :" + data.toString());
-  });
-});
-
-/* End of file I/O */
 fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
   if (err) return console.error(err);
   wireBonder = JSON.parse(data);
@@ -152,6 +240,27 @@ app.get('/wireBonder/:key', function(req, res) {
   res.render('fix-it', wireBonder[req.params.key]);
 });
 
+app.get('/fix-it/:machine/', function(req, res) {
+  res.render('fix', {name:req.params.machine, node:trees[req.params.machine].root});
+})
+
+app.get('/fix-it/:machine/:node', function(req, res) {
+  let str = req.params.node.split('.');
+  let currNode = trees[req.params.machine].root;
+  for (let i = 0; i < str.length; i++) {
+    let index = parseInt(str[i]);
+    currNode = currNode.children[index];
+  }
+  res.render('fix', {name:req.params.machine, node:currNode, trace:req.params.node})
+})
+
+app.get('/edit', function(req, res) {
+  res.render('editChooseMachine', {ids});
+})
+
+app.get('/edit/:machine', function(req, res) {
+  res.render('editMachine', trees[req.params.machine]);
+})
 
 app.use(function(req, res) {
   res.type('text/html');

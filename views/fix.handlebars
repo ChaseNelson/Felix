@@ -13,7 +13,11 @@ find a way to keep appending the new link to the end -->
     <h3>What happened</h3>
     <ul>
       {{#each node.children}}
-        <li><a href='/fix-it/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
+          {{#if @root.trace}}
+            <li><a href='/fix-it/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
+          {{else}}
+            <li><a href='/fix-it/{{@root.name}}/{{@index}}'>{{this.key}}</a></li>
+          {{/if}}
       {{/each}}
     </ul>
   </div>
