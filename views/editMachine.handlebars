@@ -2,8 +2,60 @@
 should let the user travers through the tree
 and edit parts the want to -->
 <div class="page-header">
-  <h3>Edit</h3>
+  <h3>Edit {{name}}</h3>
 </div>
 <div>
+  <h3>Does the following need edited?</h3>
+  <br>
+  <form class="editNode" role="form" action="/process?form=formEditNode" method="POST">
 
+    <div class="form-group">
+      <label for="fieldInstruction" class="col-sm-2 control-label">Instruction</label>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" id="fieldInstruction" name="instruction" value='{{node.instruction}}'>
+      </div>
+    </div><!-- End of form-group -->
+
+    <div class="form-group">
+      <label for="fieldNewNode" class="col-sm-2 control-label">Add New Node<br><i>(Leave blank for no new node)</i></label>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" id="fieldNewNode" name="newKey" placeholder="What happened?">
+      </div>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" id="filedNewNode" name="newInstruction" placeholder="What instruction should be preformed?">
+      </div>
+    </div><!-- End of form-group -->
+
+    {{#if trace}}
+      <input type="hidden" name="trace" value='{{trace}}'>
+    {{else}}
+      <input type="hidden" name="trace" value="ROOT">
+    {{/if}}
+    <input type="hidden" name="machine" value='{{name}}'>
+
+    <div class="form-group">
+      <div class="col-sm-4">
+        <button type="submit" class="btn btn-default">Submit</button>
+      </div>
+    </div><!-- End of form-group -->
+
+  </form><!-- End of form -->
+</div>
+<div class="treeTraverse">
+  <br><br><br><br><br>
+  <h3>Click below to travers the tree</h3>
+  <h4>Current Instruction: {{node.instruction}}</h4>
+  <br>
+  <div class="options">
+    <h4>What happened</h4>
+    <ul>
+      {{#each node.children}}
+        {{#if @root.trace}}
+          <li><a href='/edit/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
+        {{else}}
+          <li><a href='/edit/{{@root.name}}/{{@index}}'>{{this.key}}</a></li>
+        {{/if}}
+      {{/each}}
+    </ul>
+  </div>
 </div>

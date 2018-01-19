@@ -74,9 +74,9 @@ class Tree {
       currNode = currNode.children[index];
     }
     try {
-      if (mode === 'K') {
+      if (mode === 'K' && currNode.key !== newName) {
         currNode.key = newName;
-      } else if (mode === 'I') {
+      } else if (mode === 'I' && currNode.instruction !== newName) {
         currNode.instruction = newName;
       }
     } catch(e) {
@@ -187,9 +187,9 @@ app.get('/new-machine', function(req, res) {
 });
 
 app.post('/process', function(req, res) {
-  console.log("Form : " + req.query.form);
-  console.log("Machine Name : " + req.body.name);
-  console.log("Root Node : " + req.body.rootNode);
+  // console.log("Form : " + req.query.form);
+  // console.log("Machine Name : " + req.body.name);
+  // console.log("Root Node : " + req.body.rootNode);
   if (req.query.form === 'formNewMachine') {
     if (typeof trees[req.body.name] === "undefined") {
       ids.push(req.body.name);
@@ -199,6 +199,34 @@ app.post('/process', function(req, res) {
     } else {
       // machine already exsits
       console.error(req.body.name + 'is already a machine in the database');
+    }
+  } else if (req.query.form === 'formEditNode') {
+    console.log("Machine Name : " + req.body.machine);
+    console.log("Trace : " + req.body.trace);
+    console.log("Instruction : " + req.body.instruction);
+    console.log("New Node : ");
+    console.log("\tKey : " + req.body.newKey);
+    console.log("\tInstruction : " + req.body.newInstruction);
+    let tree = trees[req.body.machine];
+    tree.editNode(req.body.trace, req.body.instruction, 'I');
+    let currNode = tree.root;
+    try {
+      if (req.body.newKey !== '' && req.body.newInstruction !== '') {
+        /* @TODO: add a new child node to currnode with newKey and newInstruction */
+        if (req.body.trace !== 'ROOT' && req.body.trace !== '') {
+          let trace = req.body.trace.split('.');
+          for (let i = 0; i < trace.length; i++) {
+            let index = parseInt(trace[i]);
+            currNode = currNode.children[index];
+          }
+        }
+        currNode.children.push(new Node(req.body.newInstruction, req.body.newKey))
+      }
+      /* @TODO: add function ality to delete nodes */
+    } catch(e) {
+      console.error('Something went wrong while editing a node');
+      console.error('\tcurrNode : ' + currNode + '\n\ttrace : ' + req.body.trace);
+      console.error(e);
     }
   }
   res.redirect(303, '/thankyou');
@@ -265,8 +293,18 @@ app.get('/edit', function(req, res) {
 });
 
 app.get('/edit/:machine', function(req, res) {
-  res.render('editMachine', trees[req.params.machine]);
+  res.render('editMachine', {name:req.params.machine, node:trees[req.params.machine].root});
 });
+
+app.get('/edit/:machine/:node', function(req, res) {
+  let str = req.params.node.split('.');
+  let currNode = trees[req.params.machine].root;
+  for (let i = 0; i < str.length; i++) {
+    let index = parseInt(str[i]);
+    currNode = currNode.children[index];
+  }
+  res.render('editMachine', {name:req.params.machine, node:currNode, trace:req.params.node})
+})
 
 app.use(function(req, res) {
   res.type('text/html');
