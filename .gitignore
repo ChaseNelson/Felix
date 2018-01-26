@@ -3,6 +3,6 @@ node_modules
 *~
 credentials.js
 package-lock.json
-./public/copyOf*
-./public/keys.json
-./public/trees.json
+public/copyOf*
+public/keys.json
+public/trees.json
