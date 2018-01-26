@@ -135,15 +135,29 @@ app.use(express.static(__dirname + '/public'));
 
 // @TODO:: remove the following lines once done with testing
 // The line below init two empty trees for a wirebonder and a gantree
+// let trees = {};
 let trees = {};
 let ids = [];
-trees['wireBonder'] = new Tree('Reboot the machine');
-trees['wireBonder'].put('flip the lever', 'the green light turned on', 'ROOT');
-trees['wireBonder'].put('check the fuse', 'the red light turned on', 'ROOT');
-trees['wireBonder'].put('press the button', 'the green light turned off', '0');
-ids.push('wireBonder');
-trees['gantree'] = new Tree('Plug the device in');
-ids.push('gantree');
+let json;
+fs.readFile('./public/trees.json', function(err, data) {
+  if (err) return console.error(err);
+  json = JSON.parse(data);
+});
+fs.readFile('./public/keys.json', function(err, data) {
+  if (err) return console.error(err);
+  ids = JSON.parse(data);
+  for (let i = 0; i < ids.length; i++) {
+    trees[ids[i]] = Object.assign(new Tree, json[ids[i]]);
+  }
+});
+
+// trees['wireBonder'] = new Tree('Reboot the machine');
+// trees['wireBonder'].put('flip the lever', 'the green light turned on', 'ROOT');
+// trees['wireBonder'].put('check the fuse', 'the red light turned on', 'ROOT');
+// trees['wireBonder'].put('press the button', 'the green light turned off', '0');
+// ids.push('wireBonder');
+// trees['gantree'] = new Tree('Plug the device in');
+// ids.push('gantree');
 // End of test lines
 
 fs.readFile('./public/machineList.json', function (err, data) {
@@ -169,6 +183,17 @@ app.use(function(err, req, res, next) {
   console.log("Error : " + err.message);
   next();
 });
+
+// app.get('/open', function(req, res) {
+//   let json;
+//   let k;
+//   /* @TODO: parse trees file and adjust trees struct */
+//   fs.readFile('./public/trees.json', function(err, data) {
+//     if (err) return console.error(err);
+//     json = JSON.parse(data);
+//   });
+//   res.redirect(303, '/about');
+// });
 
 app.get('/about', function(req, res) {
   res.render('about');
@@ -207,12 +232,12 @@ app.post('/process', function(req, res) {
     console.log("New Node : ");
     console.log("\tKey : " + req.body.newKey);
     console.log("\tInstruction : " + req.body.newInstruction);
+    console.log("Delete Node : " + req.body.deleteNode);
     let tree = trees[req.body.machine];
     tree.editNode(req.body.trace, req.body.instruction, 'I');
     let currNode = tree.root;
     try {
       if (req.body.newKey !== '' && req.body.newInstruction !== '') {
-        /* @TODO: add a new child node to currnode with newKey and newInstruction */
         if (req.body.trace !== 'ROOT' && req.body.trace !== '') {
           let trace = req.body.trace.split('.');
           for (let i = 0; i < trace.length; i++) {
@@ -223,47 +248,21 @@ app.post('/process', function(req, res) {
         currNode.children.push(new Node(req.body.newInstruction, req.body.newKey))
       }
       /* @TODO: add function ality to delete nodes */
+      // if (req.body.deleteNode !== "") {
+      //   tree.deleteNode(req.body.deleteNode);
+      // }
     } catch(e) {
       console.error('Something went wrong while editing a node');
       console.error('\tcurrNode : ' + currNode + '\n\ttrace : ' + req.body.trace);
       console.error(e);
     }
   }
-  res.redirect(303, '/thankyou');
+  res.redirect(303, '/save');
   // var fn = "/public/repairDB_" + req.body.name + ".json";
   // fs.writeFile(fn, function(err) {
   //   if (err) return console.log(err);
   //   console.log();
   // })
-});
-
-app.get('/file-upload', function(req, res) {
-  var now = new Date();
-  res.render('file-upload', {
-    year  : now.getFullYear(),
-    month : now.getMonth()
-  });
-});
-
-app.get('/file-upload/:year/:month', function(req, res) {
-  var form = new formidable.IncomingForm();
-  form.parse(req, function(err, fields, file) {
-    if (err) return res.redirect(303, '/error');
-    console.log('Received File');
-    console.log(file);
-    res.redirect(303, '/thankyou');
-  });
-});
-
-fs.readFile('./public/repairDB_wirebonder.json', function (err, data) {
-  if (err) return console.error(err);
-  wireBonder = JSON.parse(data);
-})
-app.get('/wireBonder', function(req, res) {
-  res.render('fix-it', wireBonder['start']);
-});
-app.get('/wireBonder/:key', function(req, res) {
-  res.render('fix-it', wireBonder[req.params.key]);
 });
 
 app.get('/fix-it/:machine/', function(req, res) {
@@ -304,6 +303,24 @@ app.get('/edit/:machine/:node', function(req, res) {
     currNode = currNode.children[index];
   }
   res.render('editMachine', {name:req.params.machine, node:currNode, trace:req.params.node})
+});
+
+app.get('/save', function(req, res) {
+  var t = JSON.stringify(trees);
+  var k = JSON.stringify(ids);
+  fs.writeFile('./public/trees.json', t, 'utf8', function readFileCallback(err, data) {
+    if (err) return console.error(err);
+  });
+  fs.writeFile('./public/keys.json', k, 'utf8', function readFileCallback(err, data) {
+    if (err) return console.error(err);
+  });
+  fs.writeFile('./public/copyOfTrees.json', t,'utf8', function readFileCallback(err, data) {
+    if (err) return console.error(err);
+  });
+  fs.writeFile('./public/copyOfKeys.json', k,'utf8', function readFileCallback(err, data) {
+    if (err) return console.error(err);
+  });
+  res.redirect(303, '/');
 })
 
 app.use(function(req, res) {
