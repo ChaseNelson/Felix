@@ -4,8 +4,6 @@ const session    = require('express-session');
 const parseurl   = require('parseurl');
 const fs         = require('fs');
 
-// @TODO:: find a way to import the tree struct
-//         rather then having the following lines
 /* Tree data structure */
 class Node {
   constructor(instruction, key) {
@@ -93,30 +91,11 @@ class Tree {
     }
     let str      = nodePath.split('.');
     let currNode = this.root;
-    let parentNode;
-    let ele;
-    if (str.length - 1 <= 0) {
-      parentNode = this.root;
-    }
-    for (let i = 0; i < str.length; i++) {
+    for (let i = 0; i < str.length - 1; i++) {
       let index = parseInt(str[i]);
-      currNode = currNode.children[index];
-      if (i === str.length - 2) {
-        parentNode = currNode;
-      } else if (i === str.length - 1) {
-        ele = i;
-      }
+      currNode  = currNode.children[index];
     }
-
-    for (let i = 0; i < currNode.children.length; i++) {
-      this.deleteNode(nodePath + '.' + i);
-    }
-
-    currNode.instruction = null;
-    currNode.key = null;
-    currNode = null;
-    // remove currNode from parent children array
-    parentNode.children.splice(ele, 1);
+    currNode.children.splice(str[str.length - 1], 1);
   }
 } /* End of Tree data structure */
 
@@ -133,9 +112,6 @@ app.use(require('body-parser').urlencoded({extended:true}));
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public'));
 
-// @TODO:: remove the following lines once done with testing
-// The line below init two empty trees for a wirebonder and a gantree
-// let trees = {};
 let trees = {};
 let ids = [];
 let json;
@@ -143,26 +119,21 @@ fs.readFile('./public/trees.json', function(err, data) {
   if (err) return console.error(err);
   json = JSON.parse(data);
 });
+
+/* wait 100 milliseconds so the trees.json file is fully read */
+let start = new Date().getTime();
+  for (let i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > 100){
+      break;
+    }
+  }
+
 fs.readFile('./public/keys.json', function(err, data) {
   if (err) return console.error(err);
   ids = JSON.parse(data);
   for (let i = 0; i < ids.length; i++) {
     trees[ids[i]] = Object.assign(new Tree, json[ids[i]]);
   }
-});
-
-// trees['wireBonder'] = new Tree('Reboot the machine');
-// trees['wireBonder'].put('flip the lever', 'the green light turned on', 'ROOT');
-// trees['wireBonder'].put('check the fuse', 'the red light turned on', 'ROOT');
-// trees['wireBonder'].put('press the button', 'the green light turned off', '0');
-// ids.push('wireBonder');
-// trees['gantree'] = new Tree('Plug the device in');
-// ids.push('gantree');
-// End of test lines
-
-fs.readFile('./public/machineList.json', function (err, data) {
-  if (err) return console.error(err);
-  list = JSON.parse(data);
 });
 
 app.get('/', function(req, res) {
@@ -174,26 +145,10 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/junk', function(req, res, next) {
-  console.log("tired to access /junk");
-  throw new Error('/junk doesn\'t exist');
-});
-
 app.use(function(err, req, res, next) {
   console.log("Error : " + err.message);
   next();
 });
-
-// app.get('/open', function(req, res) {
-//   let json;
-//   let k;
-//   /* @TODO: parse trees file and adjust trees struct */
-//   fs.readFile('./public/trees.json', function(err, data) {
-//     if (err) return console.error(err);
-//     json = JSON.parse(data);
-//   });
-//   res.redirect(303, '/about');
-// });
 
 app.get('/about', function(req, res) {
   res.render('about');
@@ -212,17 +167,13 @@ app.get('/new-machine', function(req, res) {
 });
 
 app.post('/process', function(req, res) {
-  // console.log("Form : " + req.query.form);
-  // console.log("Machine Name : " + req.body.name);
-  // console.log("Root Node : " + req.body.rootNode);
   if (req.query.form === 'formNewMachine') {
     if (typeof trees[req.body.name] === "undefined") {
       ids.push(req.body.name);
       trees[req.body.name] = new Tree();
       trees[req.body.name].addRoot(req.body.rootNode);
       console.log(trees);
-    } else {
-      // machine already exsits
+    } else {  // machine already exsits
       console.error(req.body.name + 'is already a machine in the database');
     }
   } else if (req.query.form === 'formEditNode') {
@@ -247,10 +198,9 @@ app.post('/process', function(req, res) {
         }
         currNode.children.push(new Node(req.body.newInstruction, req.body.newKey))
       }
-      /* @TODO: add function ality to delete nodes */
-      // if (req.body.deleteNode !== "") {
-      //   tree.deleteNode(req.body.deleteNode);
-      // }
+      if (req.body.deleteNode !== '') {
+        tree.deleteNode(req.body.deleteNode);
+      }
     } catch(e) {
       console.error('Something went wrong while editing a node');
       console.error('\tcurrNode : ' + currNode + '\n\ttrace : ' + req.body.trace);
@@ -258,11 +208,7 @@ app.post('/process', function(req, res) {
     }
   }
   res.redirect(303, '/save');
-  // var fn = "/public/repairDB_" + req.body.name + ".json";
-  // fs.writeFile(fn, function(err) {
-  //   if (err) return console.log(err);
-  //   console.log();
-  // })
+
 });
 
 app.get('/fix-it/:machine/', function(req, res) {
