@@ -26,6 +26,22 @@ and edit parts the want to -->
       </div>
     </div><!-- End of form-group -->
 
+    <div class="form-group">
+      <label for="fieldDeleteNode" class="col-sm-2 control-label">Delete Node</label>
+      <div class="col-sm-4">
+        <select class="deleteNode" name="deleteNode">
+            <option value=""></option>
+            {{#each node.children}}
+                {{#if @root.trace}}
+                  <option value='{{@root.trace}}.{{@index}}'>{{this.key}}</option>
+                {{else}}
+                  <option value='{{@index}}'>{{this.key}}</option>
+                {{/if}}
+            {{/each}}
+        </select>
+      </div>
+    </div>
+
     {{#if trace}}
       <input type="hidden" name="trace" value='{{trace}}'>
     {{else}}
