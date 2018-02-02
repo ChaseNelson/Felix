@@ -123,7 +123,7 @@ fs.readFile('./public/trees.json', function(err, data) {
 /* wait 100 milliseconds so the trees.json file is fully read */
 let start = new Date().getTime();
   for (let i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > 100){
+    if ((new Date().getTime() - start) > 500){
       break;
     }
   }
@@ -156,10 +156,6 @@ app.get('/about', function(req, res) {
 
 app.get('/contact', function(req, res) {
   res.render('contact', { csrf: 'CSRF token here'});
-});
-
-app.get('/thankyou', function(req, res) {
-  res.render('thankyou');
 });
 
 app.get('/new-machine', function(req, res) {
