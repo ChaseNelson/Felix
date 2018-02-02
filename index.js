@@ -114,27 +114,60 @@ app.use(express.static(__dirname + '/public'));
 
 let trees = {};
 let ids = [];
-let json;
-fs.readFile('./public/trees.json', function(err, data) {
+// let json;
+// fs.readFile('./public/trees.json', function(err, data) {
+//   if (err) return console.error(err);
+//   json = JSON.parse(data);
+// });
+//
+// /* wait 100 milliseconds so the trees.json file is fully read */
+// let start = new Date().getTime();
+//   for (let i = 0; i < 1e7; i++) {
+//     if ((new Date().getTime() - start) > 500){
+//       break;
+//     }
+//   }
+//
+// fs.readFile('./public/keys.json', function(err, data) {
+//   if (err) return console.error(err);
+//   ids = JSON.parse(data);
+//   for (let i = 0; i < ids.length; i++) {
+//     trees[ids[i]] = Object.assign(new Tree, json[ids[i]]);
+//   }
+// });
+
+
+fs.readFile("./public/keys.json", function(err, data) {
   if (err) return console.error(err);
-  json = JSON.parse(data);
+  ids = JSON.parse(data);
+  console.log(ids);
+  // /* wait 100 milliseconds so the trees.json file is fully read */
+  // let start = new Date().getTime();
+  //   for (let i = 0; i < 1e7; i++) {
+  //     if ((new Date().getTime() - start) > 2000){
+  //       break;
+  //     }
+  //   }
+
+  for (let i = 0; i < ids.length; i++) {
+    fs.readFile('./public/' + ids[i] + "/tree.json", function(err, data) {
+      if (err) return console.error(err);
+      let json = JSON.parse(data);
+      console.log(json);
+      trees[ids[i]] = Object.assign(new Tree, json);
+    })
+  };
 });
 
+
 /* wait 100 milliseconds so the trees.json file is fully read */
-let start = new Date().getTime();
+start = new Date().getTime();
   for (let i = 0; i < 1e7; i++) {
     if ((new Date().getTime() - start) > 500){
       break;
     }
   }
-
-fs.readFile('./public/keys.json', function(err, data) {
-  if (err) return console.error(err);
-  ids = JSON.parse(data);
-  for (let i = 0; i < ids.length; i++) {
-    trees[ids[i]] = Object.assign(new Tree, json[ids[i]]);
-  }
-});
+console.log(trees);
 
 app.get('/', function(req, res) {
   res.render('home', {ids});
@@ -165,10 +198,14 @@ app.get('/new-machine', function(req, res) {
 app.post('/process', function(req, res) {
   if (req.query.form === 'formNewMachine') {
     if (typeof trees[req.body.name] === "undefined") {
-      ids.push(req.body.name);
-      trees[req.body.name] = new Tree();
-      trees[req.body.name].addRoot(req.body.rootNode);
-      console.log(trees);
+      let dir = './public/' + req.body.name;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+        ids.push(req.body.name);
+        trees[req.body.name] = new Tree();
+        trees[req.body.name].addRoot(req.body.rootNode);
+        console.log(trees);
+      }
     } else {  // machine already exsits
       console.error(req.body.name + 'is already a machine in the database');
     }
@@ -250,18 +287,27 @@ app.get('/edit/:machine/:node', function(req, res) {
 app.get('/save', function(req, res) {
   var t = JSON.stringify(trees);
   var k = JSON.stringify(ids);
-  fs.writeFile('./public/trees.json', t, 'utf8', function readFileCallback(err, data) {
-    if (err) return console.error(err);
-  });
   fs.writeFile('./public/keys.json', k, 'utf8', function readFileCallback(err, data) {
-    if (err) return console.error(err);
-  });
-  fs.writeFile('./public/copyOfTrees.json', t,'utf8', function readFileCallback(err, data) {
     if (err) return console.error(err);
   });
   fs.writeFile('./public/copyOfKeys.json', k,'utf8', function readFileCallback(err, data) {
     if (err) return console.error(err);
   });
+
+  for (let i = 0; i < ids.length; i++) {
+    fs.writeFile('./public/' + ids[i] + '/tree.json', JSON.stringify(trees[ids[i]]), 'utf8', function readFileCallback(err, data) {
+      if (err) return console.error(err);
+    });
+    fs.writeFile('./public/' + ids[i] + '/copyOfTree.json', JSON.stringify(trees[ids[i]]), 'utf8', function readFileCallback(err, data) {
+      if (err) return console.error(err);
+    });
+  }
+  // fs.writeFile('./public/trees.json', t, 'utf8', function readFileCallback(err, data) {
+  //   if (err) return console.error(err);
+  // });
+  // fs.writeFile('./public/copyOfTrees.json', t,'utf8', function readFileCallback(err, data) {
+  //   if (err) return console.error(err);
+  // });
   res.redirect(303, '/');
 })
 
