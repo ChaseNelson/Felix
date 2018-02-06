@@ -8,8 +8,13 @@ const fs         = require('fs');
 class Node {
   constructor(instruction, key) {
     this.instruction = instruction;
-    this.key = key;
-    this.children = [];
+    this.key         = key;
+    this.img         = [];
+    this.children    = [];
+  }
+
+  addImg(path) {
+    this.img.push(path);
   }
 }
 
@@ -96,6 +101,20 @@ class Tree {
       currNode  = currNode.children[index];
     }
     currNode.children.splice(str[str.length - 1], 1);
+  }
+
+  addImg(nodePath, imgPath) {
+    if (nodePath === 'ROOT' || nodePath === '') {
+      this.root.addImg(imgPath);
+      return
+    }
+    let str = nodePath.split('.');
+    let currNode = this.root;
+    for (let i = 0; i < str.length; i++) {
+      let index = parseInt(str[i]);
+      currNode = currNode.children[index];
+    }
+    currNode.addImg(imgPath);
   }
 } /* End of Tree data structure */
 
