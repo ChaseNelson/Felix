@@ -24,9 +24,11 @@ find a way to keep appending the new link to the end -->
     </ul>
   </div>
 </div>
-<div class="imgs" style="float:right">
-  <h3>Images</h3>
-  {{#each node.img as |path|}}
-    <img src='/{{@root.name}}/img/{{path}}' alt='/{{@root.name}}/img/{{path}}' style="display:inline-block" height="300em">
-  {{/each}}
-</div>
+{{#if node.img}}
+  <div class="imgs" style="float:right">
+    <h3>Images</h3>
+    {{#each node.img as |path|}}
+      <img src='/{{@root.name}}/img/{{path}}' alt='/{{@root.name}}/img/{{path}}' style="display:inline-block" height="300em">
+    {{/each}}
+  </div>
+{{/if}}
