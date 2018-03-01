@@ -7,7 +7,11 @@ and add an image where they want to -->
 <div>
   <h3>Does the following need to be edited?</h3>
   <br>
-  <form class="addImgNode" role="form" action="/process?form=formAddImgNode" method="POST">
+  {{#if trace}}
+    <form class="addImgNode" role="form" action="/process?form=formAddImgNode&machine={{name}}&node={{trace}}" method="POST" enctype="multipart/form-data">
+  {{else}}
+    <form class="addImgNode" role="form" action="/process?form=formAddImgNode&machine={{name}}&node=ROOT" method="POST" enctype="multipart/form-data">
+  {{/if}}
 
     <div class="form-group">
       <label for="fieldAddImg" class="col-sm-2 control-label">Add Img</label>
