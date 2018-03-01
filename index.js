@@ -3,6 +3,8 @@ const formidable = require('formidable');
 const session    = require('express-session');
 const parseurl   = require('parseurl');
 const fs         = require('fs');
+const multer     = require('multer');
+const path       = require('path');
 
 /* Tree data structure */
 class Node {
@@ -88,7 +90,19 @@ class Tree {
     }
   }
 
-  deleteNode(nodePath) {
+  removeIMG(currNode, name) {
+    for (let i = 0; i < currNode.img.length; i++) {
+      fs.unlink('public/' + name + '/img/' + currNode.img[i], (err) => {
+        if (err) return err;
+        console.log('public/' + name + '/img/' + currNode.img[i] + " was deleted");
+      })
+    }
+    for (let i = 0; i < currNode.children.length; i++) {
+      this.removeIMG(currNode.children[i], name);
+    }
+  }
+
+  deleteNode(nodePath, name) {
     if (nodePath === 'ROOT' || nodePath === '') {
       console.log('tried to delete root\nnot allowed');
       alert('You cannot remove the ROOT node');
@@ -100,12 +114,13 @@ class Tree {
       let index = parseInt(str[i]);
       currNode  = currNode.children[index];
     }
+    this.removeIMG(currNode.children[str.length - 1], name);
     currNode.children.splice(str[str.length - 1], 1);
   }
 
   addImg(nodePath, imgPath) {
     if (nodePath === 'ROOT' || nodePath === '') {
-      this.root.addImg(imgPath);
+      this.root.img.push(imgPath);
       return
     }
     let str = nodePath.split('.');
@@ -114,7 +129,8 @@ class Tree {
       let index = parseInt(str[i]);
       currNode = currNode.children[index];
     }
-    currNode.addImg(imgPath);
+    currNode.img.push(imgPath);
+    console.log(currNode);
   }
 } /* End of Tree data structure */
 
@@ -133,46 +149,16 @@ app.use(express.static(__dirname + '/public'));
 
 let trees = {};
 let ids = [];
-// let json;
-// fs.readFile('./public/trees.json', function(err, data) {
-//   if (err) return console.error(err);
-//   json = JSON.parse(data);
-// });
-//
-// /* wait 100 milliseconds so the trees.json file is fully read */
-// let start = new Date().getTime();
-//   for (let i = 0; i < 1e7; i++) {
-//     if ((new Date().getTime() - start) > 500){
-//       break;
-//     }
-//   }
-//
-// fs.readFile('./public/keys.json', function(err, data) {
-//   if (err) return console.error(err);
-//   ids = JSON.parse(data);
-//   for (let i = 0; i < ids.length; i++) {
-//     trees[ids[i]] = Object.assign(new Tree, json[ids[i]]);
-//   }
-// });
 
 
 fs.readFile("./public/keys.json", function(err, data) {
   if (err) return console.error(err);
   ids = JSON.parse(data);
-  console.log(ids);
-  // /* wait 100 milliseconds so the trees.json file is fully read */
-  // let start = new Date().getTime();
-  //   for (let i = 0; i < 1e7; i++) {
-  //     if ((new Date().getTime() - start) > 2000){
-  //       break;
-  //     }
-  //   }
 
   for (let i = 0; i < ids.length; i++) {
     fs.readFile('./public/' + ids[i] + "/tree.json", function(err, data) {
       if (err) return console.error(err);
       let json = JSON.parse(data);
-      console.log(json);
       trees[ids[i]] = Object.assign(new Tree, json);
     })
   };
@@ -186,7 +172,6 @@ start = new Date().getTime();
       break;
     }
   }
-console.log(trees);
 
 app.get('/', function(req, res) {
   res.render('home', {ids});
@@ -215,6 +200,7 @@ app.get('/new-machine', function(req, res) {
 });
 
 app.post('/process', function(req, res) {
+  let machine;
   if (req.query.form === 'formNewMachine') {
     if (typeof trees[req.body.name] === "undefined") {
       let dir = './public/' + req.body.name;
@@ -224,11 +210,13 @@ app.post('/process', function(req, res) {
         trees[req.body.name] = new Tree();
         trees[req.body.name].addRoot(req.body.rootNode);
         console.log(trees);
+        machine = req.body.name;
       }
     } else {  // machine already exsits
       console.error(req.body.name + 'is already a machine in the database');
     }
   } else if (req.query.form === 'formEditNode') {
+    machine = req.body.machine;
     console.log("Machine Name : " + req.body.machine);
     console.log("Trace : " + req.body.trace);
     console.log("Instruction : " + req.body.instruction);
@@ -240,6 +228,7 @@ app.post('/process', function(req, res) {
     tree.editNode(req.body.trace, req.body.instruction, 'I');
     let currNode = tree.root;
     try {
+      // Create new node
       if (req.body.newKey !== '' && req.body.newInstruction !== '') {
         if (req.body.trace !== 'ROOT' && req.body.trace !== '') {
           let trace = req.body.trace.split('.');
@@ -250,17 +239,36 @@ app.post('/process', function(req, res) {
         }
         currNode.children.push(new Node(req.body.newInstruction, req.body.newKey))
       }
+
+      // Delete node
       if (req.body.deleteNode !== '') {
-        tree.deleteNode(req.body.deleteNode);
+        tree.deleteNode(req.body.deleteNode, req.body.machine);
       }
     } catch(e) {
-      console.error('Something went wrong while editing a node');
-      console.error('\tcurrNode : ' + currNode + '\n\ttrace : ' + req.body.trace);
       console.error(e);
     }
-  }
-  res.redirect(303, '/save');
+  } else if (req.query.form === 'formAddImgNode') {
+    machine = req.query.machine;
+    let node = req.query.node;
+    console.log("Machine :: " + machine);
+    /*  Set Storage Engine */
+    let path = './public/' + machine + '/img';
+    const storage = multer.diskStorage({
+      destination: path
+    });
 
+   /* Init upload */
+   const upload = multer({
+     storage: storage
+   }).single('img');
+
+   upload(req, res, (err) => {
+     if (err) return err;
+     console.log(req.file);
+     trees[machine].addImg(node, req.file.filename);
+   });
+  }
+  res.redirect(303, '/save/' + machine);
 });
 
 app.get('/fix-it/:machine/', function(req, res) {
@@ -303,7 +311,21 @@ app.get('/edit/:machine/:node', function(req, res) {
   res.render('editMachine', {name:req.params.machine, node:currNode, trace:req.params.node})
 });
 
-app.get('/save', function(req, res) {
+app.get('/uploadImg', (req, res) => res.render('uploadChooseMachine', {ids}));
+
+app.get('/uploadImg/:machine', (req, res) => res.render('uploadMachine', {name:req.params.machine, node:trees[req.params.machine].root}));
+
+app.get('/uploadImg/:machine/:node', (req, res) => {
+  let str = req.params.node.split('.');
+  let currNode = trees[req.params.machine].root;
+  for (let i = 0; i < str.length; i++) {
+    let index = parseInt(str[i]);
+    currNode = currNode.children[index];
+  }
+  res.render('uploadMachine', {name:req.params.machine, node:currNode, trace:req.params.node});
+});
+
+app.get('/save/:machine', function(req, res) {
   var t = JSON.stringify(trees);
   var k = JSON.stringify(ids);
   fs.writeFile('./public/keys.json', k, 'utf8', function readFileCallback(err, data) {
@@ -321,13 +343,7 @@ app.get('/save', function(req, res) {
       if (err) return console.error(err);
     });
   }
-  // fs.writeFile('./public/trees.json', t, 'utf8', function readFileCallback(err, data) {
-  //   if (err) return console.error(err);
-  // });
-  // fs.writeFile('./public/copyOfTrees.json', t,'utf8', function readFileCallback(err, data) {
-  //   if (err) return console.error(err);
-  // });
-  res.redirect(303, '/');
+  res.redirect(303, '/fix-it/' + req.params.machine);
 })
 
 app.use(function(req, res) {
