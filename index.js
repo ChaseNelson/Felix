@@ -151,12 +151,12 @@ let trees = {};
 let ids = [];
 
 
-fs.readFile("./public/keys.json", function(err, data) {
+fs.readFile("./public/keys.json", (err, data) => {
   if (err) return console.error(err);
   ids = JSON.parse(data);
 
   for (let i = 0; i < ids.length; i++) {
-    fs.readFile('./public/' + ids[i] + "/tree.json", function(err, data) {
+    fs.readFile('./public/' + ids[i] + "/tree.json", (err, data) => {
       if (err) return console.error(err);
       let json = JSON.parse(data);
       trees[ids[i]] = Object.assign(new Tree, json);
@@ -173,33 +173,33 @@ start = new Date().getTime();
     }
   }
 
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
   res.render('home', {ids});
 });
 
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   console.log("looking for URL : " + req.url);
   next();
 });
 
-app.use(function(err, req, res, next) {
+app.use((err, req, res, next) => {
   console.log("Error : " + err.message);
   next();
 });
 
-app.get('/about', function(req, res) {
+app.get('/about', (req, res) => {
   res.render('about');
 });
 
-app.get('/contact', function(req, res) {
+app.get('/contact', (req, res) => {
   res.render('contact', { csrf: 'CSRF token here'});
 });
 
-app.get('/new-machine', function(req, res) {
+app.get('/new-machine', (req, res) => {
   res.render('new-machine');
 });
 
-app.post('/process', function(req, res) {
+app.post('/process', (req, res) => {
   let machine;
   if (req.query.form === 'formNewMachine') {
     if (typeof trees[req.body.name] === "undefined") {
@@ -271,19 +271,19 @@ app.post('/process', function(req, res) {
   res.redirect(303, '/save/' + machine);
 });
 
-app.get('/fix-it/:machine/', function(req, res) {
+app.get('/fix-it/:machine/', (req, res) => {
   res.render('fix', {name:req.params.machine, node:trees[req.params.machine].root});
 });
 
-app.get('/fix-it/:machine/works', function(req, res) {
+app.get('/fix-it/:machine/works', (req, res) => {
   res.render('itWorks', {name:req.params.machine});
 });
 
-app.get('/fix-it/:machine/expert', function(req, res) {
+app.get('/fix-it/:machine/expert', (req, res) => {
   res.render('expert', {name:req.params.machine});
 });
 
-app.get('/fix-it/:machine/:node', function(req, res) {
+app.get('/fix-it/:machine/:node', (req, res) => {
   let str = req.params.node.split('.');
   let currNode = trees[req.params.machine].root;
   for (let i = 0; i < str.length; i++) {
@@ -293,15 +293,15 @@ app.get('/fix-it/:machine/:node', function(req, res) {
   res.render('fix', {name:req.params.machine, node:currNode, trace:req.params.node})
 });
 
-app.get('/edit', function(req, res) {
+app.get('/edit', (req, res) => {
   res.render('editChooseMachine', {ids});
 });
 
-app.get('/edit/:machine', function(req, res) {
+app.get('/edit/:machine', (req, res) => {
   res.render('editMachine', {name:req.params.machine, node:trees[req.params.machine].root});
 });
 
-app.get('/edit/:machine/:node', function(req, res) {
+app.get('/edit/:machine/:node', (req, res) => {
   let str = req.params.node.split('.');
   let currNode = trees[req.params.machine].root;
   for (let i = 0; i < str.length; i++) {
@@ -325,7 +325,7 @@ app.get('/uploadImg/:machine/:node', (req, res) => {
   res.render('uploadMachine', {name:req.params.machine, node:currNode, trace:req.params.node});
 });
 
-app.get('/save/:machine', function(req, res) {
+app.get('/save/:machine', (req, res) => {
   var t = JSON.stringify(trees);
   var k = JSON.stringify(ids);
   fs.writeFile('./public/keys.json', k, 'utf8', function readFileCallback(err, data) {
@@ -346,18 +346,18 @@ app.get('/save/:machine', function(req, res) {
   res.redirect(303, '/fix-it/' + req.params.machine);
 })
 
-app.use(function(req, res) {
+app.use((req, res) => {
   res.type('text/html');
   res.status(404);
   res.render('404');
 });
 
-app.use(function(req, res) {
+app.use((req, res) => {
   console.error(err.stack);
   res.status(500);
   res.render('500');
 });
 
-app.listen(app.get('port'), function(){
+app.listen(app.get('port'), () => {
   console.log("Express started on http://localhost:" + app.get('port') + "\nPress Crtl+C to terminate.");
 })
