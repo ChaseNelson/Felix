@@ -4,10 +4,15 @@
 <div>
   <h3>What machine needs fixing?</h3>
   <div class="machineList">
-    <ul>
-      {{#each ids}}
-        <li><a href='/fix-it/{{this}}'>{{this}}</a></li>
-      {{/each}}
-    </ul>
+    {{#if ids}}
+      <ul>
+        {{#each ids}}
+          <li><a href='/fix-it/{{this}}'>{{this}}</a></li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <br>
+      <h4>Ohh no! There are no machines. Click <a href="/new-machine">here</a> to create add a machine.</h4>
+    {{/if}}
   </div>
 </div>
