@@ -1,0 +1,16 @@
+<!-- page should display all the machines
+and the user pick the machine they want to
+change -->
+<div class="page-header">
+  <h3>Edit Machines</h3>
+</div>
+<div>
+  <h3>What machine do you want to edit?</h3>
+  <div class="machineList">
+    <ul>
+      {{#each ids}}
+        <li><a href='/edit/{{this}}'>{{this}}</a></li>
+      {{/each}}
+    </ul>
+  </div>
+</div>
