@@ -5,6 +5,9 @@ const session     = require('express-session');
 const parseurl    = require('parseurl');
 const fs          = require('fs');
 
+// Global variables
+var dbFolder_;
+
 var app = express();
 
 app.disable('x-powered-by');
@@ -38,6 +41,10 @@ app.get('/junk', function(req, res, next) {
 app.use(function(err, req, res, next) {
   console.log("Error : " + err.message);
   next();
+});
+
+app.get('/connectToDB', function(req, res) {
+  res.render('thankyou');
 });
 
 app.get('/about', function(req, res) {

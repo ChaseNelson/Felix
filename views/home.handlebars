@@ -1,3 +1,21 @@
 <div class="page-header">
   <h3>Welcome to Felix</h3>
 </div>
+
+<form class="form-horizontal" role="form" enctype="multipart/form-data" method="POST" action="/connectToDB">
+
+  <div class="form-group">
+    <label for="dbFolderName"> Connect to a Felix Database to fix a particular instrument </label> <br/>
+    <div class="col-sm-4">
+      <input type="text" class="form-control" id="fieldName" name="dbFolderName">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-4">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+
+</form>
+
