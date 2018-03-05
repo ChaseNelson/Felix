@@ -1,0 +1,34 @@
+<!-- view page for a specific machine
+should let the user travers through the tree -->
+<!-- new link should be based on the previous links
+find a way to keep appending the new link to the end -->
+<div class="page-header">
+  <h3>{{name}} Fix-It</h3>
+</div>
+<div style="float:left">
+  <h3>Try the following instruction</h3>
+  <br>
+  <h4>{{node.instruction}}</h4>
+  <div class="options">
+    <h3>What happened</h3>
+    <ul>
+      {{#each node.children}}
+          {{#if @root.trace}}
+            <li><a href='/fix-it/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
+          {{else}}
+            <li><a href='/fix-it/{{@root.name}}/{{@index}}'>{{this.key}}</a></li>
+          {{/if}}
+      {{/each}}
+      <li><a href='/fix-it/{{@root.name}}/works'>It works</a></li>
+      <li><a href='/fix-it/{{@root.name}}/expert'>Something else happened</a></li>
+    </ul>
+  </div>
+</div>
+{{#if node.img}}
+  <div class="imgs" style="float:right">
+    <h3>Images</h3>
+    {{#each node.img as |path|}}
+      <img src='/{{@root.name}}/img/{{path}}' alt='/{{@root.name}}/img/{{path}}' style="display:inline-block" height="300em">
+    {{/each}}
+  </div>
+{{/if}}
