@@ -134,6 +134,9 @@ class Tree {
   }
 } /* End of Tree data structure */
 
+// Global variables
+var dbFolder_;
+
 var app = express();
 
 app.disable('x-powered-by');
@@ -305,6 +308,7 @@ app.get('/fix-it/:machine/:node', (req, res) => {
   }
   res.render('fix', {name:req.params.machine, node:currNode, trace:req.params.node})
 });
+
 
 app.get('/edit', (req, res) => {
   res.render('editChooseMachine', {ids});
