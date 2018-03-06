@@ -2,6 +2,7 @@ The Felix expert system
 =======================
 
 Author: Chase Nelson
+
 Supervisor: Souvik Das
 
 <b>Felix</b> is a decision tree based expert system used to diagnose equipment at the Purdue Silicon Detector Facility of Purdue University, West Lafayette. It dynamically appends information to the decision tree when an expert intervenes in the diagnosis.
