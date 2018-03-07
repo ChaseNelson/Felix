@@ -2,9 +2,9 @@
   <h3>Welcome to Felix</h3>
 </div>
 <div>
+  <h3>What machine needs fixing?</h3>
   <div class="machineList">
     {{#if ids}}
-      <h3>Which instrument do you wish to fix?</h3>
       <ul>
         {{#each ids}}
           <li><a href='/fix-it/{{this}}'>{{this}}</a></li>
@@ -12,7 +12,7 @@
       </ul>
     {{else}}
       <br>
-      <h4>There are no instrument databases accessible to Felix. Click <a href="/new-machine">here</a> to create add an instrument database.</h4>
+      <h4>Ohh no! There are no machines. Click <a href="/new-machine">here</a> to create add a machine.</h4>
     {{/if}}
   </div>
 </div>

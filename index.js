@@ -134,9 +134,6 @@ class Tree {
   }
 } /* End of Tree data structure */
 
-// Global variables
-var dbFolder_;
-
 var app = express();
 
 app.disable('x-powered-by');
@@ -250,26 +247,39 @@ app.post('/process', (req, res) => {
     } catch(e) {
       console.error(e);
     }
-  } else if (req.query.form === 'formAddImgNode') {
+  } else if (req.query.form === 'formAddImgNode') { /* Add image */
     machine = req.query.machine;
     let node = req.query.node;
     console.log("Machine :: " + machine);
     /*  Set Storage Engine */
-    let path = './public/' + machine + '/img';
+    let p = './public/' + machine + '/img';
     const storage = multer.diskStorage({
-      destination: path
+      destination: p
     });
 
-   /* Init upload */
-   const upload = multer({
-     storage: storage
-   }).single('img');
+    /* Init upload */
+    const upload = multer({
+      storage: storage,
+      fileFilter: (req, file, cb) => {
+        // allowed ext
+        const filetypes = /jpeg|jpg|png|gif/;
+        // check ext
+        const extName = filetypes.test(path.extname(file.originalname).toLowerCase());
+        // check mimetype
+        const mimeType = filetypes.test(file.mimetype)
+        if (extName && mimeType) {
+          return cb(null, true);
+        } else {
+          cb('Error: Images Only!');
+        }
+      }
+    }).single('img');
 
-   upload(req, res, (err) => {
-     if (err) return err;
-     console.log(req.file);
-     trees[machine].addImg(node, req.file.filename);
-   });
+    upload(req, res, (err) => {
+      if (err) return err;
+      console.log(req.file);
+      trees[machine].addImg(node, req.file.filename);
+    });
   }
   res.redirect(303, '/save/' + machine);
 });
@@ -295,7 +305,6 @@ app.get('/fix-it/:machine/:node', (req, res) => {
   }
   res.render('fix', {name:req.params.machine, node:currNode, trace:req.params.node})
 });
-
 
 app.get('/edit', (req, res) => {
   res.render('editChooseMachine', {ids});
