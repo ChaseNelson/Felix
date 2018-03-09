@@ -32,22 +32,11 @@ fs.readFile("./public/keys.json", (err, data) => {
   ids = JSON.parse(data);
 
   for (let i = 0; i < ids.length; i++) {
-    fs.readFile('./public/' + ids[i] + "/tree.json", (err, data) => {
-      if (err) return console.error(err);
-      let json = JSON.parse(data);
-      trees[ids[i]] = Object.assign(new Tree, json);
-    })
+    let data = fs.readFileSync('./public/' + ids[i] + '/tree.json', 'utf8');
+    let json = JSON.parse(data);
+    trees[ids[i]] = Object.assign(new Tree, json);
   };
 });
-
-
-/* wait 100 milliseconds so the trees.json file is fully read */
-start = new Date().getTime();
-  for (let i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > 500){
-      break;
-    }
-  }
 
 app.get('/', (req, res) => {
   res.render('home', {ids});
