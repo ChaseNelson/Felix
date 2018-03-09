@@ -1,3 +1,4 @@
+/* Middle Ware Consts */
 const express    = require('express');
 const formidable = require('formidable');
 const session    = require('express-session');
@@ -6,7 +7,7 @@ const fs         = require('fs');
 const multer     = require('multer');
 const path       = require('path');
 
-// Data structures used to store information in Felix
+/* Data structures used to store information in Felix */
 const Node = require('./DataStructures/Node.js');
 const Tree = require('./DataStructures/Tree.js');
 
@@ -26,11 +27,12 @@ app.use(express.static(__dirname + '/public'));
 let trees = {};
 let ids = [];
 
-
+/* read the keys file to get a list of all the instruments */
 fs.readFile("./public/keys.json", (err, data) => {
   if (err) return console.error(err);
   ids = JSON.parse(data);
 
+  /* loop though all the instruments and store their tree information */
   for (let i = 0; i < ids.length; i++) {
     let data = fs.readFileSync('./public/' + ids[i] + '/tree.json', 'utf8');
     let json = JSON.parse(data);
@@ -66,7 +68,7 @@ app.get('/new-machine', (req, res) => {
 
 app.post('/process', (req, res) => {
   let machine;
-  if (req.query.form === 'formNewMachine') {
+  if (req.query.form === 'formNewMachine') { /* sent from new-machine form */
     if (typeof trees[req.body.name] === "undefined") {
       let dir = './public/' + req.body.name;
       if (!fs.existsSync(dir)) {
@@ -80,7 +82,7 @@ app.post('/process', (req, res) => {
     } else {  // machine already exsits
       console.error(req.body.name + 'is already a machine in the database');
     }
-  } else if (req.query.form === 'formEditNode') {
+  } else if (req.query.form === 'formEditNode') { /* sent from edit-node form */
     machine = req.body.machine;
     console.log("Machine Name : " + req.body.machine);
     console.log("Trace : " + req.body.trace);
@@ -112,7 +114,7 @@ app.post('/process', (req, res) => {
     } catch(e) {
       console.error(e);
     }
-  } else if (req.query.form === 'formAddImgNode') { /* Add image */
+  } else if (req.query.form === 'formAddImgNode') { /* sent from add-img form */
     machine = req.query.machine;
     let node = req.query.node;
     console.log("Machine :: " + machine);
