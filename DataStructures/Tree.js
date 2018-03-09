@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 class Tree {
   constructor(instruction) {
     if (typeof instruction == 'undefined') {
