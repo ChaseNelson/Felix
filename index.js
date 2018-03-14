@@ -6,6 +6,7 @@ const parseurl   = require('parseurl');
 const fs         = require('fs');
 const multer     = require('multer');
 const path       = require('path');
+const multiparty = require('multiparty');
 
 /* Data structures used to store information in Felix */
 const Node = require('./DataStructures/Node.js');
@@ -82,74 +83,46 @@ app.post('/process', (req, res) => {
     } else {  // machine already exsits
       console.error(req.body.name + 'is already a machine in the database');
     }
-  } else if (req.query.form === 'formEditNode') { /* sent from edit-node form */
-    machine = req.body.machine;
-    console.log("Machine Name : " + req.body.machine);
-    console.log("Trace : " + req.body.trace);
-    console.log("Instruction : " + req.body.instruction);
-    console.log("New Node : ");
-    console.log("\tKey : " + req.body.newKey);
-    console.log("\tInstruction : " + req.body.newInstruction);
-    console.log("Delete Node : " + req.body.deleteNode);
-    let tree = trees[req.body.machine];
-    tree.editNode(req.body.trace, req.body.instruction, 'I');
-    let currNode = tree.root;
-    try {
-      // Create new node
-      if (req.body.newKey !== '' && req.body.newInstruction !== '') {
-        if (req.body.trace !== 'ROOT' && req.body.trace !== '') {
-          let trace = req.body.trace.split('.');
-          for (let i = 0; i < trace.length; i++) {
-            let index = parseInt(trace[i]);
-            currNode = currNode.children[index];
-          }
-        }
-        currNode.children.push(new Node(req.body.newInstruction, req.body.newKey))
-      }
-
-      // Delete node
-      if (req.body.deleteNode !== '') {
-        tree.deleteNode(req.body.deleteNode, req.body.machine);
-      }
-    } catch(e) {
-      console.error(e);
-    }
-  } else if (req.query.form === 'formAddImgNode') { /* sent from add-img form */
-    machine = req.query.machine;
-    let node = req.query.node;
-    console.log("Machine :: " + machine);
-    /*  Set Storage Engine */
-    let p = './public/' + machine + '/img';
-    const storage = multer.diskStorage({
-      destination: p
-    });
-
-    /* Init upload */
-    const upload = multer({
-      storage: storage,
-      fileFilter: (req, file, cb) => {
-        // allowed ext
-        const filetypes = /jpeg|jpg|png|gif/;
-        // check ext
-        const extName = filetypes.test(path.extname(file.originalname).toLowerCase());
-        // check mimetype
-        const mimeType = filetypes.test(file.mimetype)
-        if (extName && mimeType) {
-          return cb(null, true);
-        } else {
-          cb('Error: Images Only!');
-        }
-      }
-    }).single('img');
-
-    upload(req, res, (err) => {
-      if (err) return err;
-      console.log(req.file);
-      trees[machine].addImg(node, req.file.filename);
-    });
   }
   res.redirect(303, '/save/' + machine);
 });
+
+app.post('/editNode', (req, res) => {
+  let form = new multiparty.Form();
+
+  form.parse(req, (err, fields, files) => {
+    let machine = fields.machine[0];
+    let tree = trees[machine];
+    let currNode = tree.root;
+    tree.editNode(fields.trace[0], fields.instruction[0], 'I');
+    // Create new node
+    if (fields.newKey[0] !== '' && fields.newInstruction[0] !== '') {
+      if (fields.trace[0] !== 'ROOT' && fields.trace[0] !== '') {
+        let t = fields.trace[0];
+        for (let i = 0; i < t.length; i++) {
+          let index = parseInt(t[i]);
+          currNode = currNode.children[index];
+        }
+      }
+      currNode.children.push(new Node(fields.newInstruction[0], fields.newKey[0]));
+    } // end of create node
+
+    // Delete node
+    if (fields.deleteNode[0] !== '') {
+      tree.deleteNode(fields.deleteNode[0], machine);
+    }
+    for (let i = 0; i < files['img'].length; i++) {
+      let file = files['img'][i];
+      let tmp_path = file['path'];
+      let target_path = 'public/' + machine +'/img/' + file['originalFilename'];
+      fs.renameSync(tmp_path, target_path);
+      trees[machine].addImg(fields.trace[0], file['originalFilename']);
+    }
+  })
+
+  let machine = req.query.machine;
+  res.redirect(303, '/save/' + machine);
+})
 
 app.get('/fix-it/:machine/', (req, res) => {
   res.render('fix', {name:req.params.machine, node:trees[req.params.machine].root});
