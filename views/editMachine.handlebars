@@ -49,11 +49,7 @@ and edit parts the want to -->
       </div>
     </div><!-- End of form-group -->
 
-    {{#if trace}}
-      <input type="hidden" name="trace" value='{{trace}}'>
-    {{else}}
-      <input type="hidden" name="trace" value="ROOT">
-    {{/if}}
+    <input type="hidden" name="hash" value='{{node.name}}'>
     <input type="hidden" name="machine" value='{{name}}'>
 
     <div class="form-group">
@@ -72,12 +68,8 @@ and edit parts the want to -->
   <div class="options">
     <h4>What happened</h4>
     <ul>
-      {{#each node.children}}
-        {{#if @root.trace}}
-          <li><a href='/edit/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
-        {{else}}
-          <li><a href='/edit/{{@root.name}}/{{@index}}'>{{this.key}}</a></li>
-        {{/if}}
+      {{#each graph}}
+        <li><a href='/edit/{{@root.name}}/{{this.name}}'>{{this.key}}</a></li>
       {{/each}}
     </ul>
   </div>
