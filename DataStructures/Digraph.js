@@ -55,9 +55,15 @@ class Digraph {
     return true;
   }
 
+  /**
+    * this method should remove an edge from one vert to another
+    * and if the second vert does not have any references remove it from the list
+    * then check the child to see if it has refs
+  */
+  /* @TODO: implement what is stated above */
   deleteVertice(vertHash) {
     // make sure vertice exists
-    if (this.vertice[vertHash] === 'undefined') return false;
+    if (typeof this.vertice[vertHash] === 'undefined') return false;
     // create temp var to hole vertice
     let vert = this.vertices[vertHash];
     // remove vert from vertices
@@ -79,6 +85,12 @@ class Digraph {
         this.deleteVertice(temp.name);
       }
     }
+  }
+
+  addImg(vertHash, imgPath) {
+    if (typeof this.vertices[vertHash] === 'undefined') return false;
+    this.vertices[vertHash].img.push(imgPath);
+    return true;
   }
 }
 
