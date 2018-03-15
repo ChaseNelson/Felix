@@ -82,4 +82,4 @@ class Digraph {
   }
 }
 
-module.exports = Graph;
+module.exports = Digraph;
