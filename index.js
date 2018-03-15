@@ -10,7 +10,7 @@ const multiparty = require('multiparty');
 
 /* Data structures used to store information in Felix */
 const Node = require('./DataStructures/Node.js');
-const Tree = require('./DataStructures/Digraph.js');
+const Graph = require('./DataStructures/Digraph.js');
 
 var app = express();
 
@@ -37,7 +37,7 @@ fs.readFile("./public/keys.json", (err, data) => {
   for (let i = 0; i < ids.length; i++) {
     let data = fs.readFileSync('./public/' + ids[i] + '/graph.json', 'utf8');
     let json = JSON.parse(data);
-    graph[ids[i]] = Object.assign(new Graph, json);
+    graphs[ids[i]] = Object.assign(new Graph, json);
   };
 });
 
@@ -69,12 +69,13 @@ app.get('/new-machine', (req, res) => {
 
 app.post('/process', (req, res) => {
   if (req.query.form === 'formNewMachine') { /* sent from new-machine form */
-    if (typeof graph[req.body.name] === "undefined") {
+    if (typeof graphs[req.body.name] === "undefined") {
       let dir = './public/' + req.body.name;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
         ids.push(req.body.name);
-        graph[req.body.name] = new Tree(req.body.rootNode);
+        graphs[req.body.name] = new Graph(req.body.rootNode);
+        console.log(graphs);
       } else { // directory already exsits
         console.error(req.body.name + ' is already a directory in the database');
       }
@@ -95,10 +96,10 @@ app.get('/save/:machine', (req, res) => {
     if (err) return console.error(err);
   });
 
-  fs.writeFile('./public/' + req.params.machine + '/graph.json', JSON.stringify(trees[req.params.machine]), 'utf8', function readFileCallback(err, data) {
+  fs.writeFile('./public/' + req.params.machine + '/graph.json', JSON.stringify(graphs[req.params.machine]), 'utf8', function readFileCallback(err, data) {
     if (err) return console.error(err);
   });
-  fs.writeFile('./public/' + req.params.machine + '/copyOfGraph.json', JSON.stringify(trees[req.params.machine]), 'utf8', function readFileCallback(err, data) {
+  fs.writeFile('./public/' + req.params.machine + '/copyOfGraph.json', JSON.stringify(graphs[req.params.machine]), 'utf8', function readFileCallback(err, data) {
     if (err) return console.error(err);
   });
   res.redirect(303, '/fix-it/' + req.params.machine);
