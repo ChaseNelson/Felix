@@ -1,5 +1,18 @@
 const fs = require('fs');
 
+class Node {
+  constructor(instruction, key) {
+    this.instruction = instruction;
+    this.key         = key;
+    this.img         = [];
+    this.children    = [];
+  }
+
+  addImg(path) {
+    this.img.push(path);
+  }
+};
+
 class Tree {
   constructor(instruction) {
     if (typeof instruction == 'undefined') {
