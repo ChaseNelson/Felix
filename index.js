@@ -67,6 +67,34 @@ app.get('/new-machine', (req, res) => {
   res.render('new-machine');
 });
 
+app.get('/fix-it/:machine/', (req, res) => {
+  let g = graphs[req.params.machine];
+  let gr = g['vertices'];
+  let conn = [];
+  for (let i = 0; i < gr[g.rootHash].connected.length; i++) {
+    conn.push(gr[gr[g.rootHash].connected[i]]);
+  }
+  res.render('fix', {name:req.params.machine, node:gr[g.rootHash], graph:conn});
+});
+
+app.get('/fix-it/:machine/works', (req, res) => {
+  res.render('works', {name:req.params.machine});
+});
+
+app.get('/fix-it/:machine/expert', (req, res) => {
+  res.render('expert', {name:req.params.machine});
+});
+
+app.get('/fix-it/:machine/:node', (req, res) => {
+  let g = graphs[req.params.machine];
+  let gr = g['vertices'];
+  let conn = [];
+  for (let i = 0; i < gr[req.params.node].connected.length; i++) {
+    conn.push(gr[gr[req.params.node].connected[i]]);
+  }
+  res.render('fix', {name:req.params.machine, node:gr[req.params.node], graph:conn})
+});
+
 app.post('/process', (req, res) => {
   if (req.query.form === 'formNewMachine') { /* sent from new-machine form */
     if (typeof graphs[req.body.name] === "undefined") {

@@ -12,12 +12,8 @@ find a way to keep appending the new link to the end -->
   <div class="options">
     <h3>What happened</h3>
     <ul>
-      {{#each node.children}}
-          {{#if @root.trace}}
-            <li><a href='/fix-it/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
-          {{else}}
-            <li><a href='/fix-it/{{@root.name}}/{{@index}}'>{{this.key}}</a></li>
-          {{/if}}
+      {{#each graph}}
+        <li><a href='/fix-it/{{@root.name}}/{{this.name}}'>{{this.key}}</a></li>
       {{/each}}
       <li><a href='/fix-it/{{@root.name}}/works'>It works</a></li>
       <li><a href='/fix-it/{{@root.name}}/expert'>Something else happened</a></li>
