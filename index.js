@@ -68,7 +68,6 @@ app.get('/new-machine', (req, res) => {
 });
 
 app.post('/process', (req, res) => {
-  let machine;
   if (req.query.form === 'formNewMachine') { /* sent from new-machine form */
     if (typeof trees[req.body.name] === "undefined") {
       let dir = './public/' + req.body.name;
@@ -77,14 +76,14 @@ app.post('/process', (req, res) => {
         ids.push(req.body.name);
         trees[req.body.name] = new Tree();
         trees[req.body.name].addRoot(req.body.rootNode);
-        console.log(trees);
-        machine = req.body.name;
+      } else { // directory already exsits
+        console.error(req.body.name + ' is already a directory in the database');
       }
     } else {  // machine already exsits
-      console.error(req.body.name + 'is already a machine in the database');
+      console.error(req.body.name + ' is already a instruction in the database');
     }
   }
-  res.redirect(303, '/save/' + machine);
+  res.redirect(303, '/save/' + req.body.name);
 });
 
 app.post('/editNode', (req, res) => {
@@ -113,10 +112,12 @@ app.post('/editNode', (req, res) => {
     }
     for (let i = 0; i < files['img'].length; i++) {
       let file = files['img'][i];
-      let tmp_path = file['path'];
-      let target_path = 'public/' + machine +'/img/' + file['originalFilename'];
-      fs.renameSync(tmp_path, target_path);
-      trees[machine].addImg(fields.trace[0], file['originalFilename']);
+      if (file['originalFilename'] !== '') {
+        let tmp_path = file['path'];
+        let target_path = 'public/' + machine +'/img/' + file['originalFilename'];
+        fs.renameSync(tmp_path, target_path);
+        trees[machine].addImg(fields.trace[0], file['originalFilename']);
+      }
     }
   })
 
@@ -164,22 +165,8 @@ app.get('/edit/:machine/:node', (req, res) => {
   res.render('editMachine', {name:req.params.machine, node:currNode, trace:req.params.node})
 });
 
-app.get('/uploadImg', (req, res) => res.render('uploadChooseMachine', {ids}));
-
-app.get('/uploadImg/:machine', (req, res) => res.render('uploadMachine', {name:req.params.machine, node:trees[req.params.machine].root}));
-
-app.get('/uploadImg/:machine/:node', (req, res) => {
-  let str = req.params.node.split('.');
-  let currNode = trees[req.params.machine].root;
-  for (let i = 0; i < str.length; i++) {
-    let index = parseInt(str[i]);
-    currNode = currNode.children[index];
-  }
-  res.render('uploadMachine', {name:req.params.machine, node:currNode, trace:req.params.node});
-});
-
 app.get('/save/:machine', (req, res) => {
-  var t = JSON.stringify(trees);
+  var t = JSON.stringify(trees[req.params.machine]);
   var k = JSON.stringify(ids);
   fs.writeFile('./public/keys.json', k, 'utf8', function readFileCallback(err, data) {
     if (err) return console.error(err);
@@ -188,14 +175,12 @@ app.get('/save/:machine', (req, res) => {
     if (err) return console.error(err);
   });
 
-  for (let i = 0; i < ids.length; i++) {
-    fs.writeFile('./public/' + ids[i] + '/tree.json', JSON.stringify(trees[ids[i]]), 'utf8', function readFileCallback(err, data) {
-      if (err) return console.error(err);
-    });
-    fs.writeFile('./public/' + ids[i] + '/copyOfTree.json', JSON.stringify(trees[ids[i]]), 'utf8', function readFileCallback(err, data) {
-      if (err) return console.error(err);
-    });
-  }
+  fs.writeFile('./public/' + req.params.machine + '/tree.json', JSON.stringify(trees[req.params.machine]), 'utf8', function readFileCallback(err, data) {
+    if (err) return console.error(err);
+  });
+  fs.writeFile('./public/' + req.params.machine + '/copyOfTree.json', JSON.stringify(trees[req.params.machine]), 'utf8', function readFileCallback(err, data) {
+    if (err) return console.error(err);
+  });
   res.redirect(303, '/fix-it/' + req.params.machine);
 })
 
