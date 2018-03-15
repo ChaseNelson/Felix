@@ -82,4 +82,4 @@ class Digraph {
   }
 }
 
-module.exports = Tree;
+module.exports = Graph;
