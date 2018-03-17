@@ -110,13 +110,29 @@ app.get('/edit/:machine', (req, res) => {
 });
 
 app.get('/edit/:machine/:node', (req, res) => {
-  let g = graphs[req.params.machine];
-  let gr = g['vertices'];
+  let g = graphs[req.params.machine]; // the entire digraph object
+  let gr = g['vertices']; // just the vertices of the digraph
+
+  // store all the connected vertices to the current vertex in curr
   let conn = [];
   for (let i = 0; i < gr[req.params.node].connected.length; i++) {
     conn.push(gr[gr[req.params.node].connected[i]]);
   }
-  res.render('editMachine', {name:req.params.machine, node:gr[req.params.node], graph:conn})
+
+  // get all the hashes
+  let vert = g.getAllVertices();
+  // remove the current hash
+  vert.splice(vert.indexOf(req.params.node), 1);
+  for (let i = 0; i < conn.length; i++) { // remove all hashes at are already connected
+    let index = vert.indexOf(conn);
+    vert.splice(index, 1);
+  }
+  let v = [];
+  for (let i = 0; i < vert.length; i++) { // grab all the vertices of the hashes
+    v.push(gr[vert[i]]);
+  }
+
+  res.render('editMachine', {name:req.params.machine, node:gr[req.params.node], graph:conn, vert:v})
 });
 
 app.post('/process', (req, res) => {
@@ -172,6 +188,9 @@ app.post('/editNode', (req, res) => {
 
     // delete edge to node
     let t = g.deleteVertex(fields.hash[0], fields.deleteNode[0]);
+
+    // add edge from this to connectedNode
+    g.addEdge(fields.hash[0], fields.connectNode[0])
 
     // save the machine
     res.redirect(303, '/save/' + fields.machine[0]);
