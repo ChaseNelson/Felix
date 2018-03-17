@@ -31,12 +31,8 @@ and edit parts the want to -->
       <div class="col-sm-4">
         <select class="deleteNode" name="deleteNode">
             <option value=""></option>
-            {{#each node.children}}
-                {{#if @root.trace}}
-                  <option value='{{@root.trace}}.{{@index}}'>{{this.key}}</option>
-                {{else}}
-                  <option value='{{@index}}'>{{this.key}}</option>
-                {{/if}}
+            {{#each graph}}
+              <option value="{{this.name}}">{{this.key}}</option>
             {{/each}}
         </select>
       </div>

@@ -168,7 +168,10 @@ app.post('/editNode', (req, res) => {
     }
 
     // create a new vertex and add an edge from this to new vertex
-    console.log(g.addVertex(fields.newInstruction[0], fields.newKey[0], fields.hash[0]));
+    g.addVertex(fields.newInstruction[0], fields.newKey[0], fields.hash[0]);
+
+    // delete edge to node
+    let t = g.deleteVertex(fields.hash[0], fields.deleteNode[0]);
 
     // save the machine
     res.redirect(303, '/save/' + fields.machine[0]);

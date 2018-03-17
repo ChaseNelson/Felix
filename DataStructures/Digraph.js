@@ -60,35 +60,40 @@ class Digraph {
   }
 
   /**
-    * this method should remove an edge from one vert to another
-    * and if the second vert does not have any references remove it from the list
-    * then check the child to see if it has refs
+  * this method should remove an edge from one vert to another
+  * and if the second vert does not have any references remove it from the list
+  * then check the child to see if it has refs
   */
-  /* @TODO: implement what is stated above */
-  deleteVertex(vertHash) {
+  deleteVertex(vertHash, connHash) {
+    // make sure all params are valid
+    if (vertHash === '' || connHash === '') return false;
+    if (vertHash === null || connHash === null) return false;
+
     // make sure vertex exists
-    if (typeof this.vertices[vertHash] === 'undefined') return false;
+    if (typeof this.vertices[vertHash] === 'undefined' || typeof this.vertices[connHash] === 'undefined') return false;
+
     // create temp var to hole vertex
     let vert = this.vertices[vertHash];
-    // remove vert from vertices
-    this.vertices[vertHash] = undefined;
-    // remove all references of parent vertices
-    for (x in this.vertices) {
-      if (typeof x === 'undefined') continue;
-      let index = x.connected.indexOf(vertHash)
-      if (index > -1) {
-        // remove vertHash from connected
-        x.connected.splice(index, 1);
-      }
+    let conn = this.vertices[connHash];
+
+    // remove conn from vert connected
+    let index = vert.connected.indexOf(connHash);
+    if (index <= -1) return false; // conn is not connected to vert
+    vert.connected.splice(index, 1);
+
+    // decrement conn ref count
+    conn.ref--;
+
+    // chech if ref has 0 connections
+    if (conn.ref > 0) return true;
+
+    // remove all children
+    for (let i = 0; i < conn.connected.length; i++) {
+      this.deleteVertex(connHash, conn.connected[i]);
     }
-    // decrement all children and if ref == 0 remove the children
-    for (let i = 0; i < vert.connected.length; i++) {
-      let temp = this.vertices[vert.connected[i]];
-      temp.ref--;
-      if (temp.ref == 0) {
-        this.deleteVertex(temp.name);
-      }
-    }
+
+    this.vertices[connHash] = undefined;
+    return true;
   }
 
   addImg(vertHash, imgPath) {
