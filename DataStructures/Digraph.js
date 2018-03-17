@@ -49,10 +49,17 @@ class Digraph {
   }
 
   addEdge(parentHash, childHash) {
+    // make sure all params are valid
+    if (parentHash === '' || childHash === '') return false;
+    if (parentHash === null || childHash === null) return false;
+
     // make sure that parent and child exists
     if (typeof this.vertices[parentHash] === 'undefined' || typeof this.vertices[childHash] === 'undefined') return false;
+
     // crete temp vars to hold parent and child
-    let parent = this.vertices[parentHash], child = this.vertices[childHash];
+    let parent = this.vertices[parentHash]
+    let child = this.vertices[childHash];
+
     // increment child ref and add child to parent connected
     child.ref++;
     parent.connected.push(childHash);
@@ -100,6 +107,14 @@ class Digraph {
     if (typeof this.vertices[vertHash] === 'undefined') return false;
     this.vertices[vertHash].img.push(imgPath);
     return true;
+  }
+
+  getAllVertices() {
+    let ret = [];
+    for (let i in this.vertices) {
+      ret.push(i);
+    }
+    return ret;
   }
 }
 
