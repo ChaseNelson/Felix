@@ -166,6 +166,11 @@ app.post('/editNode', (req, res) => {
         g.addImg(fields.hash[0], file['originalFilename']);
       }
     }
+
+    // create a new vertex and add an edge from this to new vertex
+    console.log(g.addVertex(fields.newInstruction[0], fields.newKey[0], fields.hash[0]));
+
+    // save the machine
     res.redirect(303, '/save/' + fields.machine[0]);
   });
 });

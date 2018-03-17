@@ -30,14 +30,18 @@ class Digraph {
     this.vertices[this.rootHash] = root;
   }
 
-  addVertice(instruction, key, parentHash) {
+  addVertex(instruction, key, parentHash) {
+    // Chech that all the params are filled
+    if (instruction === '' || key === '' || parentHash === '') return false;
+    if (instruction === null || key === null || parentHash === null) return false;
+
     // create a temp node
     let temp_node = new Node(instruction, key);
     let h = temp_node.name;
-    // make sure the vertice does not already exist and that the parent is valid
-    if (typeof this.vertices[h] !== 'undefined' || typeof this.vertices[parentHash] !== 'undefined') return false;
+    // make sure the vertex does not already exist and that the parent is valid
+    if (typeof this.vertices[h] !== 'undefined' || typeof this.vertices[parentHash] === 'undefined') return false;
 
-    // increment ref counter and add vertice to vertices list and partent list
+    // increment ref counter and add vertex to vertices list and partent list
     temp_node.ref++;
     this.vertices[h] = temp_node;
     this.vertices[parentHash].connected.push(h);
@@ -61,10 +65,10 @@ class Digraph {
     * then check the child to see if it has refs
   */
   /* @TODO: implement what is stated above */
-  deleteVertice(vertHash) {
-    // make sure vertice exists
-    if (typeof this.vertice[vertHash] === 'undefined') return false;
-    // create temp var to hole vertice
+  deleteVertex(vertHash) {
+    // make sure vertex exists
+    if (typeof this.vertices[vertHash] === 'undefined') return false;
+    // create temp var to hole vertex
     let vert = this.vertices[vertHash];
     // remove vert from vertices
     this.vertices[vertHash] = undefined;
@@ -82,7 +86,7 @@ class Digraph {
       let temp = this.vertices[vert.connected[i]];
       temp.ref--;
       if (temp.ref == 0) {
-        this.deleteVertice(temp.name);
+        this.deleteVertex(temp.name);
       }
     }
   }
