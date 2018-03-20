@@ -31,7 +31,7 @@ let ids = [];
 
 /* read the keys file to get a list of all the instruments */
 fs.readFile("./public/keys.json", (err, data) => {
-  if (err) return console.error(err);
+  if (err) return  console.error(err);
   ids = JSON.parse(data);
 
   /* loop though all the instruments and store their tree information */
@@ -86,54 +86,72 @@ app.get('/fix-it/:machine/expert', (req, res) => {
   res.render('expert', {name:req.params.machine});
 });
 
-app.get('/fix-it/:machine/:node', (req, res) => {
-  let g = graphs[req.params.machine];
-  let gr = g['vertices'];
-  let conn = [];
-  for (let i = 0; i < gr[req.params.node].connected.length; i++) {
-    conn.push(gr[gr[req.params.node].connected[i]]);
+app.get('/fix-it/:machine/:node', (req, res, next) => {
+  try {
+    let g = graphs[req.params.machine];
+    let gr = g['vertices'];
+    let conn = [];
+    for (let i = 0; i < gr[req.params.node].connected.length; i++) {
+      conn.push(gr[gr[req.params.node].connected[i]]);
+    }
+    res.render('fix', {name:req.params.machine, node:gr[req.params.node], graph:conn})
+  } catch (e) {
+      console.error(e);
+      res.status(404);
+      next();
   }
-  res.render('fix', {name:req.params.machine, node:gr[req.params.node], graph:conn})
 });
 
 app.get('/edit', (req, res) => {
   res.render('editChooseMachine', {ids});
 });
 
-app.get('/edit/:machine', (req, res) => {
-  let g = graphs[req.params.machine];
-  let gr = g['vertices'];
-  let conn = [];
-  for (let i = 0; i < gr[g.rootHash].connected.length; i++) {
-    conn.push(gr[gr[g.rootHash].connected[i]]);
+app.get('/edit/:machine', (req, res, next) => {
+  try {
+    let g = graphs[req.params.machine];
+    let gr = g['vertices'];
+    let conn = [];
+    for (let i = 0; i < gr[g.rootHash].connected.length; i++) {
+      conn.push(gr[gr[g.rootHash].connected[i]]);
+    }
+    res.render('editMachine', {name:req.params.machine, node:gr[g.rootHash], graph:conn});
+  } catch (e) {
+    console.error(e);
+    res.status(404);
+    next();
   }
-  res.render('editMachine', {name:req.params.machine, node:gr[g.rootHash], graph:conn});
 });
 
-app.get('/edit/:machine/:node', (req, res) => {
-  let g = graphs[req.params.machine]; // the entire digraph object
-  let gr = g['vertices']; // just the vertices of the digraph
+app.get('/edit/:machine/:node', (req, res, next) => {
+  try {
+    let g = graphs[req.params.machine]; // the entire digraph object
+    let gr = g['vertices']; // just the vertices of the digraph
 
-  // store all the connected vertices to the current vertex in curr
-  let conn = [];
-  for (let i = 0; i < gr[req.params.node].connected.length; i++) {
-    conn.push(gr[gr[req.params.node].connected[i]]);
-  }
+    // store all the connected vertices to the current vertex in curr
+    let conn = [];
+    for (let i = 0; i < gr[req.params.node].connected.length; i++) {
+      conn.push(gr[gr[req.params.node].connected[i]]);
+    }
 
-  // get all the hashes
-  let vert = g.getAllVertices();
-  // remove the current hash
-  vert.splice(vert.indexOf(req.params.node), 1);
-  for (let i = 0; i < conn.length; i++) { // remove all hashes at are already connected
-    let index = vert.indexOf(conn);
-    vert.splice(index, 1);
-  }
-  let v = [];
-  for (let i = 0; i < vert.length; i++) { // grab all the vertices of the hashes
-    v.push(gr[vert[i]]);
-  }
+    // get all the hashes
+    let vert = g.getAllVertices();
+    // remove the current hash
+    vert.splice(vert.indexOf(req.params.node), 1);
+    for (let i = 0; i < conn.length; i++) { // remove all hashes at are already connected
+      let index = vert.indexOf(conn);
+      vert.splice(index, 1);
+    }
+    let v = [];
+    for (let i = 0; i < vert.length; i++) { // grab all the vertices of the hashes
+      v.push(gr[vert[i]]);
+    }
 
-  res.render('editMachine', {name:req.params.machine, node:gr[req.params.node], graph:conn, vert:v})
+    res.render('editMachine', {name:req.params.machine, node:gr[req.params.node], graph:conn, vert:v})
+  } catch (e) {
+    console.error(e);
+    res.status(404);
+    next();
+  }
 });
 
 app.post('/process', (req, res) => {
@@ -222,24 +240,22 @@ app.post('/contactForm', (req, res) => {
   res.redirect(303, '/');
 });
 
-app.get('/save/:machine', (req, res) => {
-  var t = JSON.stringify(graphs[req.params.machine]);
-  var k = JSON.stringify(ids);
-  fs.writeFile('./public/keys.json', k, 'utf8', function readFileCallback(err, data) {
-    if (err) return console.error(err);
-  });
-  fs.writeFile('./public/copyOfKeys.json', k,'utf8', function readFileCallback(err, data) {
-    if (err) return console.error(err);
-  });
+app.get('/save/:machine', (req, res, next) => {
+  try {
+    var t = JSON.stringify(graphs[req.params.machine]);
+    var k = JSON.stringify(ids);
+    fs.writeFileSync('./public/keys.json', k, 'utf8');
+    fs.writeFileSync('./public/copyOfKeys.json', k,'utf8');
 
-  fs.writeFile('./public/' + req.params.machine + '/graph.json', JSON.stringify(graphs[req.params.machine]), 'utf8', function readFileCallback(err, data) {
-    if (err) return console.error(err);
-  });
-  fs.writeFile('./public/' + req.params.machine + '/copyOfGraph.json', JSON.stringify(graphs[req.params.machine]), 'utf8', function readFileCallback(err, data) {
-    if (err) return console.error(err);
-  });
-  res.redirect(303, '/fix-it/' + req.params.machine);
-})
+    fs.writeFileSync('./public/' + req.params.machine + '/graph.json', JSON.stringify(graphs[req.params.machine]), 'utf8');
+    fs.writeFileSync('./public/' + req.params.machine + '/copyOfGraph.json', JSON.stringify(graphs[req.params.machine]), 'utf8');
+    res.redirect(303, '/fix-it/' + req.params.machine);
+  } catch (e) {
+    console.error(e);
+    res.status(404);
+    next();
+  }
+});
 
 app.use((req, res) => {
   res.type('text/html');
@@ -255,4 +271,4 @@ app.use((req, res) => {
 
 app.listen(app.get('port'), () => {
   console.log("Express started on http://localhost:" + app.get('port') + "\nPress Crtl+C to terminate.");
-})
+});
