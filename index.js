@@ -7,6 +7,7 @@ const fs         = require('fs');
 const multer     = require('multer');
 const path       = require('path');
 const multiparty = require('multiparty');
+const nodemailer = require('nodemailer');
 
 /* Data structures used to store information in Felix */
 const Node = require('./DataStructures/Node.js');
@@ -195,6 +196,30 @@ app.post('/editNode', (req, res) => {
     // save the machine
     res.redirect(303, '/save/' + fields.machine[0]);
   });
+});
+
+app.post('/contactForm', (req, res) => {
+  /* @TODO: send an email containing the form body /
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'youremail@gmail.com',
+      pass: 'yourpassword'
+    }
+  });
+  let mailOptions = {
+    from: 'youremail@gmail.com',
+    to: 'myfriend@yahoo.com',
+    subject: 'Felix Form',
+    text: 'Felix Form Below\nName: ' + req.body.name + '\nEmail: ' + req.body.email + '\nMessage: ' + req.body.message;
+  };
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) console.log(error);
+  }); */
+  console.log(req.body.name);
+  console.log(req.body.email);
+  console.log(req.body.message);
+  res.redirect(303, '/');
 });
 
 app.get('/save/:machine', (req, res) => {
