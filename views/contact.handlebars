@@ -2,28 +2,42 @@
   <h3>Contact Us</h3>
 </div>
 <div class="contactUs">
-  <h4>Send Us your Questions</h4>
-  <form class="formContactUs" role="form" action="/process?form=contactus" method="POST">
-    <input type="hidden" name="_csrf" value="{{csrf}}">
-
-    <div class="form-group">
-      <label for="fieldEmail" class="col-sm-2 control-label">Email</label>
-      <div class="col-sm-4">
-        <input type="text" class="form-control" id="fieldEmail" name="email">
-      </div>
-    </div><!-- End of form-group -->
-
-    <div class="form-group">
-      <label for="fieldQues" class="col-sm-2 control-label">Questions</label>
-      <div class="col-sm-4">
-        <input type="text" class="form-control" id="fieldQues" name="ques">
-      </div>
-    </div><!-- End of form-group -->
-
-    <div class="form-group">
-      <div class="col-sm-4">
-        <button type="submit" class="btn btn-default">Submit</button>
-      </div>
-    </div><!-- End of form-group -->
+  <form class="contact" action="/contactForm" method="POST">
+    <ul style="list-style-type: none">
+      <li>
+        <div class="form-group">
+          <label for="fieldName" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="fieldName" name="name" placeholder="*Name" required>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br>
+      <li>
+        <div class="form-group">
+          <label for="fieldEmail" class="col-sm-2 control-label">Email</label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="fieldEmail" name="email" placeholder="*Email" required>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br>
+      <li>
+        <div class="form-group">
+          <label for="fieldMessage" class="col-sm-2 control-label">Message</label>
+          <div class="col-lg-10">
+            <textarea name="message" rows="8" cols="80" placeholder="*Message" required></textarea>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br>
+      <li>
+        <div class="form-group">
+          <div class="col-sm-4">
+            <button type="submit" class="btn btn-default">Submit</button>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+    </ul>
   </form>
 </div><!-- End of contactUs -->

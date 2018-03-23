@@ -8,60 +8,76 @@ and edit parts the want to -->
   <h3>Does the following need to be edited?</h3>
   <br>
   <form class="editNode" role="form" action="/editNode?form=formEditNode&machine={{name}}" method="POST" enctype="multipart/form-data">
+    <ul style="list-style-type: none">
+      <li>
+        <div class="form-group">
+          <label for="fieldInstruction" class="col-sm-2 control-label">Instruction</label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="fieldInstruction" name="instruction" value='{{node.instruction}}' required>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br>
+      <li>
+        <div class="form-group">
+          <label for="fieldNewNode" class="col-sm-2 control-label">Add New Node<br><i>(Leave blank for no new node)</i></label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="fieldNewNode" name="newKey" placeholder="What happened?">
+          </div>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="filedNewNode" name="newInstruction" placeholder="What instruction should be preformed?">
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br><br><br>
+      <li>
+        <div class="form-group">
+          <label for="fieldDeleteNode" class="col-sm-2 control-label">Delete Node</label>
+          <div class="col-sm-4">
+            <select class="deleteNode" name="deleteNode">
+                <option value=""></option>
+                {{#each graph}}
+                  <option value="{{this.name}}">{{this.key}}</option>
+                {{/each}}
+            </select>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br>
+      <li>
+        <div class="form-group">
+          <label for="fieldConnectNode" class="col-sm-2 control-label">Connect Node<br><i>(result -- instruction)</i></label>
+          <div class="col-sm-4">
+            <select class="connectNode" name="connectNode">
+                <option value=""></option>
+                {{#each vert}}
+                  <option value="{{this.name}}">{{this.key}} -- {{this.instruction}}</option>
+                {{/each}}
+            </select>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br>
+      <li>
+        <div class="form-group">
+          <label for="fieldAddImg" class="col-sm-2 control-label">Add Img</label>
+          <div class="col-sm-4">
+            <input type="file" class="form-control" id="fieldAddImg" name="img">
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+      <br><br>
+      <input type="hidden" name="hash" value='{{node.name}}'>
+      <input type="hidden" name="machine" value='{{name}}'>
 
-    <div class="form-group">
-      <label for="fieldInstruction" class="col-sm-2 control-label">Instruction</label>
-      <div class="col-sm-4">
-        <input type="text" class="form-control" id="fieldInstruction" name="instruction" value='{{node.instruction}}' required>
-      </div>
-    </div><!-- End of form-group -->
-
-    <div class="form-group">
-      <label for="fieldNewNode" class="col-sm-2 control-label">Add New Node<br><i>(Leave blank for no new node)</i></label>
-      <div class="col-sm-4">
-        <input type="text" class="form-control" id="fieldNewNode" name="newKey" placeholder="What happened?">
-      </div>
-      <div class="col-sm-4">
-        <input type="text" class="form-control" id="filedNewNode" name="newInstruction" placeholder="What instruction should be preformed?">
-      </div>
-    </div><!-- End of form-group -->
-
-    <div class="form-group">
-      <label for="fieldDeleteNode" class="col-sm-2 control-label">Delete Node</label>
-      <div class="col-sm-4">
-        <select class="deleteNode" name="deleteNode">
-            <option value=""></option>
-            {{#each node.children}}
-                {{#if @root.trace}}
-                  <option value='{{@root.trace}}.{{@index}}'>{{this.key}}</option>
-                {{else}}
-                  <option value='{{@index}}'>{{this.key}}</option>
-                {{/if}}
-            {{/each}}
-        </select>
-      </div>
-    </div><!-- End of form-group -->
-
-    <div class="form-group">
-      <label for="fieldAddImg" class="col-sm-2 control-label">Add Img</label>
-      <div class="col-sm-4">
-        <input type="file" class="form-control" id="fieldAddImg" name="img">
-      </div>
-    </div><!-- End of form-group -->
-
-    {{#if trace}}
-      <input type="hidden" name="trace" value='{{trace}}'>
-    {{else}}
-      <input type="hidden" name="trace" value="ROOT">
-    {{/if}}
-    <input type="hidden" name="machine" value='{{name}}'>
-
-    <div class="form-group">
-      <div class="col-sm-4">
-        <button type="submit" class="btn btn-default">Submit</button>
-      </div>
-    </div><!-- End of form-group -->
-
+      <li>
+        <div class="form-group">
+          <div class="col-sm-4">
+            <button type="submit" class="btn btn-default">Submit</button>
+          </div>
+        </div><!-- End of form-group -->
+      </li>
+    </ul>
   </form><!-- End of form -->
 </div>
 <div class="treeTraverse">
@@ -72,12 +88,8 @@ and edit parts the want to -->
   <div class="options">
     <h4>What happened</h4>
     <ul>
-      {{#each node.children}}
-        {{#if @root.trace}}
-          <li><a href='/edit/{{@root.name}}/{{@root.trace}}.{{@index}}'>{{this.key}}</a></li>
-        {{else}}
-          <li><a href='/edit/{{@root.name}}/{{@index}}'>{{this.key}}</a></li>
-        {{/if}}
+      {{#each graph}}
+        <li><a href='/edit/{{@root.name}}/{{this.name}}'>{{this.key}}</a></li>
       {{/each}}
     </ul>
   </div>
