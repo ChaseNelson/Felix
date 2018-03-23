@@ -1,4 +1,5 @@
 const md5 = require('md5');
+const fs  = require('fs');
 
 class Node {
   constructor(instruction, key) {
@@ -16,7 +17,7 @@ class Node {
 };
 
 class Digraph {
-  constructor(instruction) {
+  constructor(instruction, instrumentName) {
     let root;
     if (typeof instruction === 'undefined') {
       root = null;
@@ -25,6 +26,7 @@ class Digraph {
       root = new Node(instruction, 'ROOT')
     }
     root.ref = 1;
+    this.instrumentName = instrumentName;
     this.rootHash = root.name;
     this.vertices = {};
     this.vertices[this.rootHash] = root;
@@ -71,7 +73,7 @@ class Digraph {
   * and if the second vert does not have any references remove it from the list
   * then check the child to see if it has refs
   */
-  deleteVertex(vertHash, connHash) {
+  deleteEdge(vertHash, connHash) {
     // make sure all params are valid
     if (vertHash === '' || connHash === '') return false;
     if (vertHash === null || connHash === null) return false;
@@ -96,9 +98,18 @@ class Digraph {
 
     // remove all children
     for (let i = 0; i < conn.connected.length; i++) {
-      this.deleteVertex(connHash, conn.connected[i]);
+      this.deleteEdge(connHash, conn.connected[i]);
     }
 
+    // delete pictures
+    for (let i = 0; i < conn.img.length; i++) {
+      fs.unlink('public/' + this.instrumentName + '/img/' + conn.img[i], (err) => {
+        if (err) return err;
+        console.log('public/' + this.instrumentName + '/img/' + conn.img[i] + ' was deleted.');
+      });
+    }
+
+    // remove from map
     this.vertices[connHash] = undefined;
     return true;
   }
