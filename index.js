@@ -162,7 +162,7 @@ app.post('/process', (req, res) => {
         fs.mkdirSync(dir);
         fs.mkdirSync(dir + '/img');
         ids.push(req.body.name);
-        graphs[req.body.name] = new Graph(req.body.rootNode);
+        graphs[req.body.name] = new Graph(req.body.rootNode, req.body.name);
         console.log(graphs);
       } else { // directory already exsits
         console.error(req.body.name + ' is already a directory in the database');
@@ -206,7 +206,7 @@ app.post('/editNode', (req, res) => {
     g.addVertex(fields.newInstruction[0], fields.newKey[0], fields.hash[0]);
 
     // delete edge to node
-    let t = g.deleteVertex(fields.hash[0], fields.deleteNode[0]);
+    let t = g.deleteEdge(fields.hash[0], fields.deleteNode[0]);
 
     // add edge from this to connectedNode
     g.addEdge(fields.hash[0], fields.connectNode[0])
