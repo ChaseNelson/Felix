@@ -26,8 +26,8 @@ app.use(require('body-parser').urlencoded({extended:true}));
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public'));
 
-let graphs = {};
-let ids = [];
+var graphs = {};
+var ids = [];
 
 /* read the keys file to get a list of all the instruments */
 fs.readFile("./public/keys.json", (err, data) => {
@@ -35,9 +35,9 @@ fs.readFile("./public/keys.json", (err, data) => {
   ids = JSON.parse(data);
 
   /* loop though all the instruments and store their tree information */
-  for (let i = 0; i < ids.length; i++) {
-    let data = fs.readFileSync('./public/' + ids[i] + '/graph.json', 'utf8');
-    let json = JSON.parse(data);
+  for (var i = 0; i < ids.length; i++) {
+    var data = fs.readFileSync('./public/' + ids[i] + '/graph.json', 'utf8');
+    var json = JSON.parse(data);
     graphs[ids[i]] = Object.assign(new Graph, json);
   };
 });
@@ -69,10 +69,10 @@ app.get('/new-machine', (req, res) => {
 });
 
 app.get('/fix-it/:machine/', (req, res) => {
-  let g = graphs[req.params.machine];
-  let gr = g['vertices'];
-  let conn = [];
-  for (let i = 0; i < gr[g.rootHash].connected.length; i++) {
+  var g = graphs[req.params.machine];
+  var gr = g['vertices'];
+  var conn = [];
+  for (var i = 0; i < gr[g.rootHash].connected.length; i++) {
     conn.push(gr[gr[g.rootHash].connected[i]]);
   }
   res.render('fix', {name:req.params.machine, node:gr[g.rootHash], graph:conn});
@@ -88,10 +88,10 @@ app.get('/fix-it/:machine/expert', (req, res) => {
 
 app.get('/fix-it/:machine/:node', (req, res, next) => {
   try {
-    let g = graphs[req.params.machine];
-    let gr = g['vertices'];
-    let conn = [];
-    for (let i = 0; i < gr[req.params.node].connected.length; i++) {
+    var g = graphs[req.params.machine];
+    var gr = g['vertices'];
+    var conn = [];
+    for (var i = 0; i < gr[req.params.node].connected.length; i++) {
       conn.push(gr[gr[req.params.node].connected[i]]);
     }
     res.render('fix', {name:req.params.machine, node:gr[req.params.node], graph:conn})
@@ -108,10 +108,10 @@ app.get('/edit', (req, res) => {
 
 app.get('/edit/:machine', (req, res, next) => {
   try {
-    let g = graphs[req.params.machine];
-    let gr = g['vertices'];
-    let conn = [];
-    for (let i = 0; i < gr[g.rootHash].connected.length; i++) {
+    var g = graphs[req.params.machine];
+    var gr = g['vertices'];
+    var conn = [];
+    for (var i = 0; i < gr[g.rootHash].connected.length; i++) {
       conn.push(gr[gr[g.rootHash].connected[i]]);
     }
     res.render('editMachine', {name:req.params.machine, node:gr[g.rootHash], graph:conn});
@@ -124,25 +124,25 @@ app.get('/edit/:machine', (req, res, next) => {
 
 app.get('/edit/:machine/:node', (req, res, next) => {
   try {
-    let g = graphs[req.params.machine]; // the entire digraph object
-    let gr = g['vertices']; // just the vertices of the digraph
+    var g = graphs[req.params.machine]; // the entire digraph object
+    var gr = g['vertices']; // just the vertices of the digraph
 
     // store all the connected vertices to the current vertex in curr
-    let conn = [];
-    for (let i = 0; i < gr[req.params.node].connected.length; i++) {
+    var conn = [];
+    for (var i = 0; i < gr[req.params.node].connected.length; i++) {
       conn.push(gr[gr[req.params.node].connected[i]]);
     }
 
     // get all the hashes
-    let vert = g.getAllVertices();
+    var vert = g.getAllVertices();
     // remove the current hash
     vert.splice(vert.indexOf(req.params.node), 1);
-    for (let i = 0; i < conn.length; i++) { // remove all hashes at are already connected
-      let index = vert.indexOf(conn);
+    for (var i = 0; i < conn.length; i++) { // remove all hashes at are already connected
+      var index = vert.indexOf(conn);
       vert.splice(index, 1);
     }
-    let v = [];
-    for (let i = 0; i < vert.length; i++) { // grab all the vertices of the hashes
+    var v = [];
+    for (var i = 0; i < vert.length; i++) { // grab all the vertices of the hashes
       v.push(gr[vert[i]]);
     }
 
@@ -157,7 +157,7 @@ app.get('/edit/:machine/:node', (req, res, next) => {
 app.post('/process', (req, res) => {
   if (req.query.form === 'formNewMachine') { /* sent from new-machine form */
     if (typeof graphs[req.body.name] === "undefined") {
-      let dir = './public/' + req.body.name;
+      var dir = './public/' + req.body.name;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
         fs.mkdirSync(dir + '/img');
@@ -175,25 +175,25 @@ app.post('/process', (req, res) => {
 });
 
 app.post('/editNode', (req, res) => {
-  let form = new multiparty.Form();
+  var form = new multiparty.Form();
 
   form.parse(req, (err, fields, files) => {
     console.log('fields');
     console.log(fields);
-    let g = graphs[fields.machine[0]];
-    let gr = g['vertices'];
-    let vert = gr[fields.hash[0]];
+    var g = graphs[fields.machine[0]];
+    var gr = g['vertices'];
+    var vert = gr[fields.hash[0]];
 
     // change the instruction
     vert.instruction = fields.instruction[0];
 
     // add imgages
-    for (let i = 0; i < files['img'].length; i++) {
-      let file = files['img'][i];
+    for (var i = 0; i < files['img'].length; i++) {
+      var file = files['img'][i];
       if (file['originalFilename'] !== '') {
-        let tmp_path = file['path'];
-        let target_path = './public/' + fields.machine[0] +'/img/' + file['originalFilename'];
-        let dir = './public/' + fields.machine[0] + '/img';
+        var tmp_path = file['path'];
+        var target_path = './public/' + fields.machine[0] +'/img/' + file['originalFilename'];
+        var dir = './public/' + fields.machine[0] + '/img';
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir);
         }
@@ -206,7 +206,7 @@ app.post('/editNode', (req, res) => {
     g.addVertex(fields.newInstruction[0], fields.newKey[0], fields.hash[0]);
 
     // delete edge to node
-    let t = g.deleteEdge(fields.hash[0], fields.deleteNode[0]);
+    var t = g.deleteEdge(fields.hash[0], fields.deleteNode[0]);
 
     // add edge from this to connectedNode
     g.addEdge(fields.hash[0], fields.connectNode[0])
@@ -218,14 +218,14 @@ app.post('/editNode', (req, res) => {
 
 app.post('/contactForm', (req, res) => {
   /* @TODO: send an email containing the form body /
-  let transporter = nodemailer.createTransport({
+  var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: 'youremail@gmail.com',
       pass: 'yourpassword'
     }
   });
-  let mailOptions = {
+  var mailOptions = {
     from: 'youremail@gmail.com',
     to: 'myfriend@yahoo.com',
     subject: 'Felix Form',

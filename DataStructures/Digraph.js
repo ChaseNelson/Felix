@@ -18,7 +18,7 @@ class Node {
 
 class Digraph {
   constructor(instruction, instrumentName) {
-    let root;
+    var root;
     if (typeof instruction === 'undefined') {
       root = null;
       return;
@@ -38,8 +38,8 @@ class Digraph {
     if (instruction === null || key === null || parentHash === null) return false;
 
     // create a temp node
-    let temp_node = new Node(instruction, key);
-    let h = temp_node.name;
+    var temp_node = new Node(instruction, key);
+    var h = temp_node.name;
     // make sure the vertex does not already exist and that the parent is valid
     if (typeof this.vertices[h] !== 'undefined' || typeof this.vertices[parentHash] === 'undefined') return false;
 
@@ -59,8 +59,8 @@ class Digraph {
     if (typeof this.vertices[parentHash] === 'undefined' || typeof this.vertices[childHash] === 'undefined') return false;
 
     // crete temp vars to hold parent and child
-    let parent = this.vertices[parentHash]
-    let child = this.vertices[childHash];
+    var parent = this.vertices[parentHash]
+    var child = this.vertices[childHash];
 
     // increment child ref and add child to parent connected
     child.ref++;
@@ -82,11 +82,11 @@ class Digraph {
     if (typeof this.vertices[vertHash] === 'undefined' || typeof this.vertices[connHash] === 'undefined') return false;
 
     // create temp var to hole vertex
-    let vert = this.vertices[vertHash];
-    let conn = this.vertices[connHash];
+    var vert = this.vertices[vertHash];
+    var conn = this.vertices[connHash];
 
     // remove conn from vert connected
-    let index = vert.connected.indexOf(connHash);
+    var index = vert.connected.indexOf(connHash);
     if (index <= -1) return false; // conn is not connected to vert
     vert.connected.splice(index, 1);
 
@@ -97,12 +97,12 @@ class Digraph {
     if (conn.ref > 0) return true;
 
     // remove all children
-    for (let i = 0; i < conn.connected.length; i++) {
+    for (var i = 0; i < conn.connected.length; i++) {
       this.deleteEdge(connHash, conn.connected[i]);
     }
 
     // delete pictures
-    for (let i = 0; i < conn.img.length; i++) {
+    for (var i = 0; i < conn.img.length; i++) {
       fs.unlink('public/' + this.instrumentName + '/img/' + conn.img[i], (err) => {
         if (err) return err;
         console.log('public/' + this.instrumentName + '/img/' + conn.img[i] + ' was deleted.');
@@ -121,8 +121,8 @@ class Digraph {
   }
 
   getAllVertices() {
-    let ret = [];
-    for (let i in this.vertices) {
+    var ret = [];
+    for (var i in this.vertices) {
       ret.push(i);
     }
     return ret;
