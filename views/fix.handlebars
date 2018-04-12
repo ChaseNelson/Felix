@@ -13,10 +13,10 @@ find a way to keep appending the new link to the end -->
     <h3>What happened</h3>
     <ul>
       {{#each graph}}
-        <li><a href='/fix-it/{{@root.name}}/{{this.name}}'>{{this.key}}</a></li>
+        <li><a href='{{@root.name}}/{{this.name}}'>{{this.key}}</a></li>
       {{/each}}
-      <li><a href='/fix-it/{{@root.name}}/works'>It works</a></li>
-      <li><a href='/fix-it/{{@root.name}}/expert'>Something else happened</a></li>
+      <li><a href='{{@root.name}}/works'>It works</a></li>
+      <li><a href='{{@root.name}}/expert'>Something else happened</a></li>
     </ul>
   </div>
 </div>
@@ -24,7 +24,7 @@ find a way to keep appending the new link to the end -->
   <div class="imgs" style="float:right">
     <h3>Images</h3>
     {{#each node.img as |path|}}
-      <img src='/{{@root.name}}/img/{{path}}' alt='/{{@root.name}}/img/{{path}}' style="display:inline-block" height="300em">
+      <img src='{{@root.name}}/img/{{path}}' alt='{{@root.name}}/img/{{path}}' style="display:inline-block" height="300em">
     {{/each}}
   </div>
 {{/if}}

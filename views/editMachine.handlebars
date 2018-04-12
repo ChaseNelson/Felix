@@ -7,7 +7,7 @@ and edit parts the want to -->
 <div>
   <h3>Does the following need to be edited?</h3>
   <br>
-  <form class="editNode" role="form" action="/editNode?form=formEditNode&machine={{name}}" method="POST" enctype="multipart/form-data">
+  <form class="editNode" role="form" action="editNode?form=formEditNode&machine={{name}}" method="POST" enctype="multipart/form-data">
     <ul style="list-style-type: none">
       <li>
         <div class="form-group">
@@ -89,7 +89,7 @@ and edit parts the want to -->
     <h4>What happened</h4>
     <ul>
       {{#each graph}}
-        <li><a href='/edit/{{@root.name}}/{{this.name}}'>{{this.key}}</a></li>
+        <li><a href='edit/{{@root.name}}/{{this.name}}'>{{this.key}}</a></li>
       {{/each}}
     </ul>
   </div>
